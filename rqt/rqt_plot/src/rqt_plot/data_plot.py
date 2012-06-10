@@ -34,7 +34,7 @@
 from __future__ import division
 import math, sys
 
-import qt_gui.QtBindingHelper #@UnusedImport
+import qt_gui.qt_binding_helper #@UnusedImport
 from QtCore import QEvent, QPointF, QTimer, Qt, SIGNAL, Signal, Slot
 from QtGui import QPen, QVector2D
 import Qwt
