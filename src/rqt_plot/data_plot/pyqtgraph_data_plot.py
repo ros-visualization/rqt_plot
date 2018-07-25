@@ -43,7 +43,12 @@ if qVersion().startswith('5.'):
         def parse_version(s):
             return [int(x) for x in re.sub(r'(\.0+)*$', '', s).split('.')]
 
-    from pyqtgraph import __version__ as pyqtgraph_version
+    try:
+        from pyqtgraph import __version__ as pyqtgraph_version
+    except:
+        import pkg_resources
+        pyqtgraph_version = pkg_resources.get_distribution("pyqtgraph").version
+
     if parse_version(pyqtgraph_version) < parse_version('0.10.0'):
         raise ImportError('A newer PyQtGraph version is required (at least 0.10 for Qt 5)')
 
