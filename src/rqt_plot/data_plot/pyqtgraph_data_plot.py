@@ -45,7 +45,9 @@ if qVersion().startswith('5.'):
 
     try:
         from pyqtgraph import __version__ as pyqtgraph_version
-    except:
+    except RuntimeError:
+        # pyqtgraph < 1.0 using Qt4 failing on 16.04 because kinetic uses Qt5.
+        # This raises RuntimeError('the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class')
         import pkg_resources
         pyqtgraph_version = pkg_resources.get_distribution("pyqtgraph").version
 
