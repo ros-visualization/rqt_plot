@@ -128,6 +128,7 @@ class ROSData(object):
                 else:
                     self.buff_x.append(rospy.get_time() - self.start_time)
                 #self.axes[index].plot(datax, buff_y)
+                self.error = None
             except AttributeError as e:
                 self.error = RosPlotException("Invalid topic spec [%s]: %s" % (self.name, str(e)))
         finally:
