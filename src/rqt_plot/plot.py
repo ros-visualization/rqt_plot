@@ -42,6 +42,7 @@ from .plot_widget import PlotWidget
 
 from .data_plot import DataPlot
 
+
 class Plot(Plugin):
 
     def __init__(self, context):
@@ -51,17 +52,19 @@ class Plot(Plugin):
         self._context = context
 
         self._args = self._parse_args(context.argv())
-        self._widget = PlotWidget(initial_topics=self._args.topics, start_paused=self._args.start_paused)
+        self._widget = PlotWidget(
+            initial_topics=self._args.topics, start_paused=self._args.start_paused)
         self._data_plot = DataPlot(self._widget)
 
         # disable autoscaling of X, and set a sane default range
         self._data_plot.set_autoscale(x=False)
-        self._data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
+        self._data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND | DataPlot.SCALE_VISIBLE)
         self._data_plot.set_xlim([0, 10.0])
 
         self._widget.switch_data_plot_widget(self._data_plot)
         if context.serial_number() > 1:
-            self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+            self._widget.setWindowTitle(
+                self._widget.windowTitle() + (' (%d)' % context.serial_number()))
         context.add_widget(self._widget)
 
     def _parse_args(self, argv):
@@ -90,7 +93,7 @@ class Plot(Plugin):
                     c_topics.extend(["%s/%s" % (base, f) for f in fields if f])
                 else:
                     c_topics.append(sub_t)
-            # #1053: resolve command-line topic names
+            # 1053: resolve command-line topic names
             import rosgraph
             c_topics = [rosgraph.names.script_resolve_name('rqt_plot', n) for n in c_topics]
             if type(c_topics) == list:
@@ -105,15 +108,16 @@ class Plot(Plugin):
     def add_arguments(parser):
         group = parser.add_argument_group('Options for rqt_plot plugin')
         group.add_argument('-P', '--pause', action='store_true', dest='start_paused',
-            help='Start in paused state')
+                           help='Start in paused state')
         group.add_argument('-e', '--empty', action='store_true', dest='start_empty',
-            help='Start without restoring previous topics')
+                           help='Start without restoring previous topics')
         group.add_argument('topics', nargs='*', default=[], help='Topics to plot')
 
     def _update_title(self):
         self._widget.setWindowTitle(self._data_plot.getTitle())
         if self._context.serial_number() > 1:
-            self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % self._context.serial_number()))
+            self._widget.setWindowTitle(
+                self._widget.windowTitle() + (' (%d)' % self._context.serial_number()))
 
     def save_settings(self, plugin_settings, instance_settings):
         self._data_plot.save_settings(plugin_settings, instance_settings)

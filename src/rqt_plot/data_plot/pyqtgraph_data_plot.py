@@ -47,7 +47,8 @@ if qVersion().startswith('5.'):
         from pyqtgraph import __version__ as pyqtgraph_version
     except RuntimeError:
         # pyqtgraph < 1.0 using Qt4 failing on 16.04 because kinetic uses Qt5.
-        # This raises RuntimeError('the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class')
+        # This raises RuntimeError('the PyQt4.QtCore and PyQt5.QtCore modules both
+        # wrap the QObject class')
         import pkg_resources
         pyqtgraph_version = pkg_resources.get_distribution("pyqtgraph").version
 
@@ -83,7 +84,8 @@ class PyQtGraphDataPlot(QWidget):
         symbolBrush = mkBrush(curve_color)
         # this adds the item to the plot and legend
         if markers_on:
-            plot = self._plot_widget.plot(name=curve_name, pen=pen, symbol=symbol, symbolPen=symbolPen, symbolBrush=symbolBrush, symbolSize=4)
+            plot = self._plot_widget.plot(name=curve_name, pen=pen, symbol=symbol,
+                                          symbolPen=symbolPen, symbolBrush=symbolBrush, symbolSize=4)
         else:
             plot = self._plot_widget.plot(name=curve_name, pen=pen)
         self._curves[curve_id] = plot
@@ -94,7 +96,7 @@ class PyQtGraphDataPlot(QWidget):
             self._plot_widget.removeItem(self._curves[curve_id])
             del self._curves[curve_id]
             self._update_legend()
-           
+
     def _update_legend(self):
         # clear and rebuild legend (there is no remove item method for the legend...)
         self._plot_widget.clear()
@@ -103,7 +105,7 @@ class PyQtGraphDataPlot(QWidget):
             self._plot_widget.addItem(curve)
         if self._current_vline:
             self._plot_widget.addItem(self._current_vline)
- 
+
     def redraw(self):
         pass
 
