@@ -62,7 +62,14 @@ def _get_topic_type(topic):
         val = master.getTopicTypes()
     except:
         raise RosPlotException("unable to get list of topics from master")
+
     matches = [(t, t_type) for t, t_type in val if t == topic or topic.startswith(t + '/')]
+
+    # Find the longest matching topic. So if user requests /foo/bar/baz and there are two topics, /foo and /foo/bar,
+    # it will match /foo/bar and look for subfield .baz, instead of /foo looking for .bar.baz.
+    # There is still ambiguity here, but hopefully this resolves it in the correct direction more often
+    matches.sort(key=lambda x: len(x[0]), reverse=True)
+
     if matches:
         t, t_type = matches[0]
         if t_type == roslib.names.ANYTYPE:
