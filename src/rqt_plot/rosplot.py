@@ -38,18 +38,16 @@ import sys
 import threading
 import time
 
-import rosgraph
-import roslib.message
-import roslib.names
-import rospy
+from rqt_py_common.message_helpers import get_message_class
 from std_msgs.msg import Bool
+from python_qt_binding.QtCore import qWarning
 
 
 class RosPlotException(Exception):
     pass
 
 
-def _get_topic_type(topic):
+def _get_topic_type(node, topic):
     """
     subroutine for getting the topic type
     (nearly identical to rostopic._get_topic_type, except it returns rest of name instead of fn)
@@ -57,31 +55,26 @@ def _get_topic_type(topic):
     :returns: topic type, real topic name, and rest of name referenced
       if the topic points to a field within a topic, e.g. /rosout/msg, ``str, str, str``
     """
-    try:
-        master = rosgraph.Master('/rosplot')
-        val = master.getTopicTypes()
-    except:
-        raise RosPlotException("unable to get list of topics from master")
-    matches = [(t, t_type) for t, t_type in val if t == topic or topic.startswith(t + '/')]
-    if matches:
-        t, t_type = matches[0]
-        if t_type == roslib.names.ANYTYPE:
-            return None, None, None
-        if t_type == topic:
-            return t_type, None
-        return t_type, t, topic[len(t):]
-    else:
-        return None, None, None
+    val = node.get_topic_names_and_types()
+    matches = [(t, t_types) for t, t_types in val if t == topic or topic.startswith(t + '/')]
+    for t, t_types in matches:
+        for t_type in t_types:
+            if t_type == topic:
+                return t_type, None, None
+        for t_type in t_types:
+            if t_type != '*':
+                return t_type, t, topic[len(t):]
+    return None, None, None
 
 
-def get_topic_type(topic):
+def get_topic_type(node, topic):
     """
     Get the topic type (nearly identical to rostopic.get_topic_type, except it doesn't return a fn)
 
     :returns: topic type, real topic name, and rest of name referenced
       if the \a topic points to a field within a topic, e.g. /rosout/msg, ``str, str, str``
     """
-    topic_type, real_topic, rest = _get_topic_type(topic)
+    topic_type, real_topic, rest = _get_topic_type(node, topic)
     if topic_type:
         return topic_type, real_topic, rest
     else:
@@ -94,25 +87,26 @@ class ROSData(object):
     Subscriber to ROS topic that buffers incoming data
     """
 
-    def __init__(self, topic, start_time):
+    def __init__(self, node, topic, start_time):
         self.name = topic
         self.start_time = start_time
         self.error = None
+        self.node = node
 
         self.lock = threading.Lock()
         self.buff_x = []
         self.buff_y = []
 
-        topic_type, real_topic, fields = get_topic_type(topic)
+        topic_type, real_topic, fields = get_topic_type(node, topic)
         if topic_type is not None:
             self.field_evals = generate_field_evals(fields)
-            data_class = roslib.message.get_message_class(topic_type)
-            self.sub = rospy.Subscriber(real_topic, data_class, self._ros_cb)
+            data_class = get_message_class(topic_type)
+            self.sub = node.create_subscription(data_class, real_topic, self._ros_cb)
         else:
             self.error = RosPlotException("Can not resolve topic type of %s" % topic)
 
     def close(self):
-        self.sub.unregister()
+        self.node.destroy_subscription(self.sub)
 
     def _ros_cb(self, msg):
         """
@@ -124,10 +118,11 @@ class ROSData(object):
             try:
                 self.buff_y.append(self._get_data(msg))
                 # 944: use message header time if present
-                if msg.__class__._has_header:
-                    self.buff_x.append(msg.header.stamp.to_sec() - self.start_time)
+                if hasattr(msg, 'header'):
+                    stamped_time = msg.header.stamp.sec + msg.header.stamp.nanosec * 10**-9
+                    self.buff_x.append(stamped_time - self.start_time)
                 else:
-                    self.buff_x.append(rospy.get_time() - self.start_time)
+                    self.buff_x.append(time.time() - self.start_time)
                 # self.axes[index].plot(datax, buff_y)
             except AttributeError as e:
                 self.error = RosPlotException("Invalid topic spec [%s]: %s" % (self.name, str(e)))
