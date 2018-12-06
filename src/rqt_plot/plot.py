@@ -50,10 +50,10 @@ class Plot(Plugin):
         self.setObjectName('Plot')
 
         self._context = context
-
+        self._node = context.node
         self._args = self._parse_args(context.argv())
         self._widget = PlotWidget(
-            initial_topics=self._args.topics, start_paused=self._args.start_paused)
+            self._node, initial_topics=self._args.topics, start_paused=self._args.start_paused)
         self._data_plot = DataPlot(self._widget)
 
         # disable autoscaling of X, and set a sane default range
@@ -66,6 +66,34 @@ class Plot(Plugin):
             self._widget.setWindowTitle(
                 self._widget.windowTitle() + (' (%d)' % context.serial_number()))
         context.add_widget(self._widget)
+
+    def _resolve_topic_name(script_name, name):
+        """
+        Name resolver for scripts.
+
+        Derived from
+            https://github.com/ros/ros_comm/blob/melodic-devel/tools/rosgraph/src/rosgraph/names.py
+
+        :param name: name to resolve, ``str``
+        :param script_name: name of script. script_name must not
+          contain a namespace., ``str``
+        :returns: resolved name, ``str``
+        """
+        sep = '/'
+        priv_name = '~'
+
+        # empty string resolves to namespace
+        if not name:
+            return self._node.get_namespace()
+        # Check for global name: /foo/name resolves to /foo/name
+        if name[0] == sep:
+            return name
+        # Check for private name: ~name resolves to /caller_id/name
+        elif name[0] == priv_name:
+            if script_name[-1] == sep:
+                return script_name + name[1:]
+            return script_name + sep + name[1:]
+        return self._node.get_namespace() + name
 
     def _parse_args(self, argv):
         parser = argparse.ArgumentParser(prog='rqt_plot', add_help=False)
@@ -84,7 +112,7 @@ class Plot(Plugin):
                     base = sub_t[:sub_t.find(':')]
                     # the first prefix includes a field name, so save then strip it off
                     c_topics.append(base)
-                    if not '/' in base:
+                    if '/' not in base:
                         parser.error("%s must contain a topic and field name" % sub_t)
                     base = base[:base.rfind('/')]
 
@@ -94,12 +122,11 @@ class Plot(Plugin):
                 else:
                     c_topics.append(sub_t)
             # 1053: resolve command-line topic names
-            import rosgraph
-            c_topics = [rosgraph.names.script_resolve_name('rqt_plot', n) for n in c_topics]
-            if type(c_topics) == list:
-                topic_list.extend(c_topics)
-            else:
-                topic_list.append(c_topics)
+            topics, topic_types = self._node.get_topic_names_and_types()
+
+            c_topics = [_resolve_topic_name('rqt_plot', n) for n in c_topics]
+            topic_list.extend(c_topics)
+
         args.topics = topic_list
 
         return args

@@ -31,47 +31,87 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import rospkg
-import roslib
+import time
 
+from ament_index_python.resources import get_resource
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, qWarning, Slot
 from python_qt_binding.QtGui import QIcon
 from python_qt_binding.QtWidgets import QAction, QMenu, QWidget
 
-import rospy
-
 from rqt_py_common.topic_completer import TopicCompleter
-from rqt_py_common import topic_helpers
+from rqt_py_common import topic_helpers, message_helpers
 
-from . rosplot import ROSData, RosPlotException
+from rqt_plot.rosplot import ROSData, RosPlotException
 
 
-def get_plot_fields(topic_name):
-    topic_type, real_topic, _ = topic_helpers.get_topic_type(topic_name)
-    if topic_type is None:
+def _parse_type(topic_type_str):
+    slot_type = topic_type_str
+    is_array = False
+    array_size = None
+
+    array_idx = topic_type_str.find('[')
+    if array_idx < 0:
+        return slot_type, False, None
+
+    end_array_idx = topic_type_str.find(']', start=array_idx + 1)
+    if end_array_idx < 0:
+        return None, False, None
+
+    slot_type = topic_type_str[:array_idx]
+    array_size_str = topic_type_str[array_idx + 1, end_array_idx]
+    try:
+        array_size = int(array_size_str)
+        return slot_type, True, array_size
+    except ValueError as e:
+        return slot_type, True, None
+
+
+def get_plot_fields(node, topic_name):
+    topics = node.get_topic_names_and_types()
+    real_topic = None
+    for name, topic_types in topics:
+        if name == topic_name[:len(name)]:
+            real_topic = name
+            topic_type_str = topic_types[0] if topic_types else None
+            break
+    if real_topic is None:
         message = "topic %s does not exist" % (topic_name)
         return [], message
+
+    if topic_type_str is None:
+        message = "no topic types found for topic %s " % (topic_name)
+        return [], message
+
+    if len(topic_name) < len(real_topic) + 1:
+        message = 'no field specified in topic name "{}"'.format(topic_name)
+        return [], message
+
     field_name = topic_name[len(real_topic) + 1:]
 
-    slot_type, is_array, array_size = roslib.msgs.parse_type(topic_type)
-    field_class = roslib.message.get_message_class(slot_type)
+    message_class = message_helpers.get_message_class(topic_type_str)
+    if message_class is None:
+        message = 'message class "{}" is invalid'.format(topic_type_str)
+        return [], message
+
+    slot_type, is_array, array_size = _parse_type(topic_type_str)
+    field_class = message_helpers.get_message_class(slot_type)
 
     fields = [f for f in field_name.split('/') if f]
 
     for field in fields:
         # parse the field name for an array index
-        try:
-            field, _, field_index = roslib.msgs.parse_type(field)
-        except roslib.msgs.MsgSpecException:
+        field, _, field_index = _parse_type(field)
+        if field is None:
             message = "invalid field %s in topic %s" % (field, real_topic)
             return [], message
 
-        if field not in getattr(field_class, '__slots__', []):
+        field_names_and_types = field_class.get_fields_and_field_types()
+        if field not in field_names_and_types:
             message = "no field %s in topic %s" % (field_name, real_topic)
             return [], message
-        slot_type = field_class._slot_types[field_class.__slots__.index(field)]
-        slot_type, slot_is_array, array_size = roslib.msgs.parse_type(slot_type)
+        slot_type = field_names_and_types[field]
+        slot_type, slot_is_array, array_size = _parse_type(slot_type)
         is_array = slot_is_array and field_index is None
 
         field_class = topic_helpers.get_type_class(slot_type)
@@ -89,11 +129,10 @@ def get_plot_fields(topic_name):
             message = "topic %s is %s" % (topic_name, topic_kind)
             return [topic_name], message
     else:
-        if not roslib.msgs.is_valid_constant_type(slot_type):
+        if not topic_helpers.is_primitive_type(slot_type):
             numeric_fields = []
-            for i, slot in enumerate(field_class.__slots__):
-                slot_type = field_class._slot_types[i]
-                slot_type, is_array, array_size = roslib.msgs.parse_type(slot_type)
+            for slot, slot_type in field_class.get_fields_and_field_types().items():
+                slot_type, is_array, array_size = _parse_type(slot_type)
                 slot_class = topic_helpers.get_type_class(slot_type)
                 if slot_class in (int, float) and not is_array:
                     numeric_fields.append(slot)
@@ -108,22 +147,23 @@ def get_plot_fields(topic_name):
             return [], message
 
 
-def is_plottable(topic_name):
-    fields, message = get_plot_fields(topic_name)
+def is_plottable(node, topic_name):
+    fields, message = get_plot_fields(node, topic_name)
     return len(fields) > 0, message
 
 
 class PlotWidget(QWidget):
     _redraw_interval = 40
 
-    def __init__(self, initial_topics=None, start_paused=False):
+    def __init__(self, node, initial_topics=None, start_paused=False):
         super(PlotWidget, self).__init__()
         self.setObjectName('PlotWidget')
 
+        self._node = node
         self._initial_topics = initial_topics
 
-        rp = rospkg.RosPack()
-        ui_file = os.path.join(rp.get_path('rqt_plot'), 'resource', 'plot.ui')
+        _, package_path = get_resource('packages', 'rqt_plot')
+        ui_file = os.path.join(package_path, 'share', 'rqt_plot', 'resource', 'plot.ui')
         loadUi(ui_file, self)
         self.subscribe_topic_button.setIcon(QIcon.fromTheme('list-add'))
         self.remove_topic_button.setIcon(QIcon.fromTheme('list-remove'))
@@ -136,10 +176,10 @@ class PlotWidget(QWidget):
             self.pause_button.setChecked(True)
 
         self._topic_completer = TopicCompleter(self.topic_edit)
-        self._topic_completer.update_topics()
+        self._topic_completer.update_topics(node)
         self.topic_edit.setCompleter(self._topic_completer)
 
-        self._start_time = rospy.get_time()
+        self._start_time = time.time()
         self._rosdata = {}
         self._remove_topic_menu = QMenu()
 
@@ -192,7 +232,7 @@ class PlotWidget(QWidget):
             topic_name = str(event.mimeData().text())
 
         # check for plottable field type
-        plottable, message = is_plottable(topic_name)
+        plottable, message = is_plottable(self._node, topic_name)
         if plottable:
             event.acceptProposedAction()
         else:
@@ -211,9 +251,9 @@ class PlotWidget(QWidget):
     def on_topic_edit_textChanged(self, topic_name):
         # on empty topic name, update topics
         if topic_name in ('', '/'):
-            self._topic_completer.update_topics()
+            self._topic_completer.update_topics(self._node)
 
-        plottable, message = is_plottable(topic_name)
+        plottable, message = is_plottable(self._node, topic_name)
         self.subscribe_topic_button.setEnabled(plottable)
         self.subscribe_topic_button.setToolTip(message)
 
@@ -280,11 +320,11 @@ class PlotWidget(QWidget):
 
     def add_topic(self, topic_name):
         topics_changed = False
-        for topic_name in get_plot_fields(topic_name)[0]:
+        for topic_name in get_plot_fields(self._node, topic_name)[0]:
             if topic_name in self._rosdata:
                 qWarning('PlotWidget.add_topic(): topic already subscribed: %s' % topic_name)
                 continue
-            self._rosdata[topic_name] = ROSData(topic_name, self._start_time)
+            self._rosdata[topic_name] = ROSData(self._node, topic_name, self._start_time)
             if self._rosdata[topic_name].error is not None:
                 qWarning(str(self._rosdata[topic_name].error))
                 del self._rosdata[topic_name]
