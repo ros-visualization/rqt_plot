@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* removing missing dep (`#18 <https://github.com/ros-visualization/rqt_plot/issues/18>`_)
+* Contributors: Mike Lautman
+
 1.0.0 (2018-12-11)
 ------------------
 * Porting to ros2 `#17 <https://github.com/ros-visualization/rqt_plot/issues/17>`_ from ros-visualization/ros2_port
