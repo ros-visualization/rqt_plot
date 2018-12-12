@@ -2,6 +2,13 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Porting to ros2 `#17 <https://github.com/ros-visualization/rqt_plot/issues/17>`_ from ros-visualization/ros2_port
+* autopep8 (`#15 <https://github.com/ros-visualization/rqt_plot/issues/15>`_)
+* pyqtgraph < 0.10 fail to run (`#13 <https://github.com/ros-visualization/rqt_plot/issues/13>`_)
+* Contributors: Kei Okada, Mike Lautman, Stephen, brawner
+
 0.4.8 (2017-04-24)
 ------------------
 * add scroll area when showing images with 1-to-1 mapping (`#433 <https://github.com/ros-visualization/rqt_common_plugins/issues/433>`_)
