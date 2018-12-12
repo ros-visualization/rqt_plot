@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2018-12-11)
+------------------
 * Porting to ros2 `#17 <https://github.com/ros-visualization/rqt_plot/issues/17>`_ from ros-visualization/ros2_port
 * autopep8 (`#15 <https://github.com/ros-visualization/rqt_plot/issues/15>`_)
 * pyqtgraph < 0.10 fail to run (`#13 <https://github.com/ros-visualization/rqt_plot/issues/13>`_)
