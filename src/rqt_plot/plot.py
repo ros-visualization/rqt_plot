@@ -67,7 +67,7 @@ class Plot(Plugin):
                 self._widget.windowTitle() + (' (%d)' % context.serial_number()))
         context.add_widget(self._widget)
 
-    def _resolve_topic_name(script_name, name):
+    def _resolve_topic_name(self, script_name, name):
         """
         Name resolver for scripts.
 
@@ -124,7 +124,7 @@ class Plot(Plugin):
             # 1053: resolve command-line topic names
             topics, topic_types = self._node.get_topic_names_and_types()
 
-            c_topics = [_resolve_topic_name('rqt_plot', n) for n in c_topics]
+            c_topics = [self._resolve_topic_name('rqt_plot', n) for n in c_topics]
             topic_list.extend(c_topics)
 
         args.topics = topic_list
