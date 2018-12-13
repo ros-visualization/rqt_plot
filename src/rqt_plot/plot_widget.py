@@ -46,12 +46,13 @@ from rqt_py_common import topic_helpers
 
 from . rosplot import ROSData, RosPlotException
 
+
 def get_plot_fields(topic_name):
     topic_type, real_topic, _ = topic_helpers.get_topic_type(topic_name)
     if topic_type is None:
-        message = "topic %s does not exist" % ( topic_name )
+        message = "topic %s does not exist" % (topic_name)
         return [], message
-    field_name = topic_name[len(real_topic)+1:]
+    field_name = topic_name[len(real_topic) + 1:]
 
     slot_type, is_array, array_size = roslib.msgs.parse_type(topic_type)
     field_class = roslib.message.get_message_class(slot_type)
@@ -63,11 +64,11 @@ def get_plot_fields(topic_name):
         try:
             field, _, field_index = roslib.msgs.parse_type(field)
         except roslib.msgs.MsgSpecException:
-            message = "invalid field %s in topic %s" % ( field, real_topic )
+            message = "invalid field %s in topic %s" % (field, real_topic)
             return [], message
 
         if field not in getattr(field_class, '__slots__', []):
-            message = "no field %s in topic %s" % ( field_name, real_topic )
+            message = "no field %s in topic %s" % (field_name, real_topic)
             return [], message
         slot_type = field_class._slot_types[field_class.__slots__.index(field)]
         slot_type, slot_is_array, array_size = roslib.msgs.parse_type(slot_type)
@@ -79,14 +80,14 @@ def get_plot_fields(topic_name):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
         if is_array:
             if array_size is not None:
-                message = "topic %s is fixed-size %s array" % ( topic_name, topic_kind )
-                return [ "%s[%d]" % (topic_name, i) for i in range(array_size) ], message
+                message = "topic %s is fixed-size %s array" % (topic_name, topic_kind)
+                return ["%s[%d]" % (topic_name, i) for i in range(array_size)], message
             else:
-                message = "topic %s is variable-size %s array" % ( topic_name, topic_kind )
+                message = "topic %s is variable-size %s array" % (topic_name, topic_kind)
                 return [], message
         else:
-            message = "topic %s is %s" % ( topic_name, topic_kind )
-            return [ topic_name ], message
+            message = "topic %s is %s" % (topic_name, topic_kind)
+            return [topic_name], message
     else:
         if not roslib.msgs.is_valid_constant_type(slot_type):
             numeric_fields = []
@@ -98,17 +99,19 @@ def get_plot_fields(topic_name):
                     numeric_fields.append(slot)
             message = ""
             if len(numeric_fields) > 0:
-                message = "%d plottable fields in %s" % ( len(numeric_fields), topic_name )
+                message = "%d plottable fields in %s" % (len(numeric_fields), topic_name)
             else:
-                message = "No plottable fields in %s" % ( topic_name )
-            return [ "%s/%s" % (topic_name, f) for f in numeric_fields ], message
+                message = "No plottable fields in %s" % (topic_name)
+            return ["%s/%s" % (topic_name, f) for f in numeric_fields], message
         else:
-            message = "Topic %s is not numeric" % ( topic_name )
+            message = "Topic %s is not numeric" % (topic_name)
             return [], message
+
 
 def is_plottable(topic_name):
     fields, message = get_plot_fields(topic_name)
     return len(fields) > 0, message
+
 
 class PlotWidget(QWidget):
     _redraw_interval = 40
@@ -174,8 +177,11 @@ class PlotWidget(QWidget):
     def dragEnterEvent(self, event):
         # get topic name
         if not event.mimeData().hasText():
-            if not hasattr(event.source(), 'selectedItems') or len(event.source().selectedItems()) == 0:
-                qWarning('Plot.dragEnterEvent(): not hasattr(event.source(), selectedItems) or len(event.source().selectedItems()) == 0')
+            if not hasattr(event.source(), 'selectedItems') or \
+                    len(event.source().selectedItems()) == 0:
+                qWarning(
+                    'Plot.dragEnterEvent(): not hasattr(event.source(), selectedItems) or '
+                    'len(event.source().selectedItems()) == 0')
                 return
             item = event.source().selectedItems()[0]
             topic_name = item.data(0, Qt.UserRole)

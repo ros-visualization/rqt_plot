@@ -92,8 +92,11 @@ import numpy
 
 
 class MatDataPlot(QWidget):
+
     class Canvas(FigureCanvas):
+
         """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
         def __init__(self, parent=None):
             super(MatDataPlot.Canvas, self).__init__(Figure())
             self.axes = self.figure.add_subplot(111)
@@ -133,7 +136,8 @@ class MatDataPlot(QWidget):
             marker_size = 3
         else:
             marker_size = 0
-        line = self._canvas.axes.plot([], [], 'o-', markersize=marker_size, label=curve_name, linewidth=1, picker=5, color=curve_color.name())[0]
+        line = self._canvas.axes.plot([], [], 'o-', markersize=marker_size, label=curve_name,
+                                      linewidth=1, picker=5, color=curve_color.name())[0]
         self._curves[curve_id] = line
         self._update_legend()
         self.set_xlim(x_limits)
@@ -162,8 +166,8 @@ class MatDataPlot(QWidget):
         self._canvas.draw()
 
     def vline(self, x, color):
-        # convert color range from (0,255) to (0,1.0) 
-        matcolor=(color[0]/255.0, color[1]/255.0, color[2]/255.0)
+        # convert color range from (0,255) to (0,1.0)
+        matcolor = (color[0] / 255.0, color[1] / 255.0, color[2] / 255.0)
         if self._current_vline:
             self._current_vline.remove()
         self._current_vline = self._canvas.axes.axvline(x=x, color=matcolor)

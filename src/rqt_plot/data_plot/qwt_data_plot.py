@@ -87,7 +87,7 @@ class QwtDataPlot(Qwt.QwtPlot):
 
         # Initialize data
         self.rescale()
-        #self.move_canvas(0, 0)
+        # self.move_canvas(0, 0)
         self.canvas().setMouseTracking(True)
         self.canvas().installEventFilter(self)
 
@@ -102,9 +102,11 @@ class QwtDataPlot(Qwt.QwtPlot):
             y = self.invTransform(Qwt.QwtPlot.yLeft, event.pos().y())
             coords = QPointF(x, y)
             if self._picker.isActive() and self._last_click_coordinates is not None:
-                toolTip = 'origin x: %.5f, y: %.5f' % (self._last_click_coordinates.x(), self._last_click_coordinates.y())
+                toolTip = 'origin x: %.5f, y: %.5f' % (
+                    self._last_click_coordinates.x(), self._last_click_coordinates.y())
                 delta = coords - self._last_click_coordinates
-                toolTip += '\ndelta x: %.5f, y: %.5f\nlength: %.5f' % (delta.x(), delta.y(), QVector2D(delta).length())
+                toolTip += '\ndelta x: %.5f, y: %.5f\nlength: %.5f' % (
+                    delta.x(), delta.y(), QVector2D(delta).length())
             else:
                 toolTip = 'buttons\nleft: measure\nmiddle: move\nright: zoom x/y\nwheel: zoom y'
             self.setToolTip(toolTip)
@@ -127,7 +129,8 @@ class QwtDataPlot(Qwt.QwtPlot):
         curve_object.attach(self)
         curve_object.setPen(curve_color)
         if markers_on:
-            curve_object.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.Ellipse, QBrush(curve_color), QPen(Qt.black), QSize(4,4)))
+            curve_object.setSymbol(
+                Qwt.QwtSymbol(Qwt.QwtSymbol.Ellipse, QBrush(curve_color), QPen(Qt.black), QSize(4, 4)))
         self._curves[curve_id] = curve_object
 
     def remove_curve(self, curve_id):
@@ -156,7 +159,7 @@ class QwtDataPlot(Qwt.QwtPlot):
                           self._x_limits[1])
 
         self._canvas_display_height = self._y_limits[1] - self._y_limits[0]
-        self._canvas_display_width  = self._x_limits[1] - self._x_limits[0]
+        self._canvas_display_width = self._x_limits[1] - self._x_limits[0]
         self.redraw()
 
     def rescale_axis_x(self, delta__x):
@@ -173,7 +176,7 @@ class QwtDataPlot(Qwt.QwtPlot):
         set the y axis height to max_value, about the current center
         """
         canvas_display_height = max_value
-        canvas_offset_y = (self._y_limits[1] + self._y_limits[0])/2.0
+        canvas_offset_y = (self._y_limits[1] + self._y_limits[0]) / 2.0
         y_lower_limit = canvas_offset_y - (canvas_display_height / 2)
         y_upper_limit = canvas_offset_y + (canvas_display_height / 2)
         self._y_limits = [y_lower_limit, y_upper_limit]
@@ -185,8 +188,8 @@ class QwtDataPlot(Qwt.QwtPlot):
         """
         canvas_offset_x = delta_x * self._canvas_display_width / self.canvas().width()
         canvas_offset_y = delta_y * self._canvas_display_height / self.canvas().height()
-        self._x_limits = [ l + canvas_offset_x for l in self._x_limits]
-        self._y_limits = [ l + canvas_offset_y for l in self._y_limits]
+        self._x_limits = [l + canvas_offset_x for l in self._x_limits]
+        self._y_limits = [l + canvas_offset_y for l in self._y_limits]
         self.rescale()
 
     def mousePressEvent(self, event):
@@ -205,7 +208,8 @@ class QwtDataPlot(Qwt.QwtPlot):
             zoom_factor = max(-0.6, min(0.6, (self._last_canvas_y - canvas_y) / 20.0 / 2.0))
             delta_y = (self.canvas().height() / 2.0) - self._pressed_canvas_y
             self.move_canvas(0, zoom_factor * delta_y * 1.0225)
-            self.scale_axis_y(max(0.005, self._canvas_display_height - (zoom_factor * self._canvas_display_height)))
+            self.scale_axis_y(
+                max(0.005, self._canvas_display_height - (zoom_factor * self._canvas_display_height)))
             self.rescale_axis_x(self._last_canvas_x - canvas_x)
         self._last_canvas_x = canvas_x
         self._last_canvas_y = canvas_y
@@ -222,9 +226,9 @@ class QwtDataPlot(Qwt.QwtPlot):
         delta_y = (self.canvas().height() / 2.0) - canvas_y
         self.move_canvas(0, zoom_factor * delta_y * 1.0225)
 
-        self.scale_axis_y(max(0.0005, self._canvas_display_height - zoom_factor * self._canvas_display_height))
+        self.scale_axis_y(
+            max(0.0005, self._canvas_display_height - zoom_factor * self._canvas_display_height))
         self.limits_changed.emit()
-
 
     def vline(self, x, color):
         qWarning("QwtDataPlot.vline is not implemented yet")
