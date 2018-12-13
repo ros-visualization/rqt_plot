@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fixing resolve_topic_name method (`#19 <https://github.com/ros-visualization/rqt_plot/issues/19>`_)
+* Contributors: Mike Lautman
+
 1.0.1 (2018-12-12)
 ------------------
 * removing missing dep (`#18 <https://github.com/ros-visualization/rqt_plot/issues/18>`_)
