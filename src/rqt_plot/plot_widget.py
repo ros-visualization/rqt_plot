@@ -155,11 +155,12 @@ def is_plottable(node, topic_name):
 class PlotWidget(QWidget):
     _redraw_interval = 40
 
-    def __init__(self, node, initial_topics=None, start_paused=False):
+    def __init__(self, node, spinner, initial_topics=None, start_paused=False):
         super(PlotWidget, self).__init__()
         self.setObjectName('PlotWidget')
 
         self._node = node
+        self._spinner = spinner
         self._initial_topics = initial_topics
 
         _, package_path = get_resource('packages', 'rqt_plot')
@@ -324,9 +325,11 @@ class PlotWidget(QWidget):
             if topic_name in self._rosdata:
                 qWarning('PlotWidget.add_topic(): topic already subscribed: %s' % topic_name)
                 continue
-            self._rosdata[topic_name] = ROSData(self._node, topic_name, self._start_time)
+            self._rosdata[topic_name] = \
+                ROSData(self._node, self._spinner, topic_name, self._start_time)
             if self._rosdata[topic_name].error is not None:
                 qWarning(str(self._rosdata[topic_name].error))
+                self._rosdata[topic_name].close()
                 del self._rosdata[topic_name]
             else:
                 data_x, data_y = self._rosdata[topic_name].next()

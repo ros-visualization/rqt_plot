@@ -51,9 +51,10 @@ class Plot(Plugin):
 
         self._context = context
         self._node = context.node
+        self._spinner = context.spinner
         self._args = self._parse_args(context.argv())
-        self._widget = PlotWidget(
-            self._node, initial_topics=self._args.topics, start_paused=self._args.start_paused)
+        self._widget = PlotWidget(self._node, self._spinner, initial_topics=self._args.topics,
+                                  start_paused=self._args.start_paused)
         self._data_plot = DataPlot(self._widget)
 
         # disable autoscaling of X, and set a sane default range

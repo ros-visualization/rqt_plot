@@ -87,11 +87,12 @@ class ROSData(object):
     Subscriber to ROS topic that buffers incoming data
     """
 
-    def __init__(self, node, topic, start_time):
+    def __init__(self, node, spinner, topic, start_time):
         self.name = topic
         self.start_time = start_time
         self.error = None
         self.node = node
+        self.spinner = spinner
 
         self.lock = threading.Lock()
         self.buff_x = []
@@ -106,7 +107,7 @@ class ROSData(object):
             self.error = RosPlotException("Can not resolve topic type of %s" % topic)
 
     def close(self):
-        self.node.destroy_subscription(self.sub)
+        self.spinner.register_listeners_for_destruction(self.sub)
 
     def _ros_cb(self, msg):
         """
