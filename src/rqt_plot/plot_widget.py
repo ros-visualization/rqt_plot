@@ -114,7 +114,10 @@ def get_plot_fields(node, topic_name):
         slot_type, slot_is_array, array_size = _parse_type(slot_type)
         is_array = slot_is_array and field_index is None
 
-        field_class = topic_helpers.get_type_class(slot_type)
+        if topic_helpers.is_primitive_type(slot_type):
+            field_class = topic_helpers.get_type_class(slot_type)
+        else:
+            field_class = message_helpers.get_message_class(slot_type)
 
     if field_class in (int, float, bool):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
