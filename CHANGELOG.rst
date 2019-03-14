@@ -2,6 +2,12 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* avoid crash for unknown message types (`#26 <https://github.com/ros-visualization/rqt_plot/issues/26>`_)
+* autopep8 (`#15 <https://github.com/ros-visualization/rqt_plot/issues/15>`_)
+* support pyqtgraph < 0.10 (`#13 <https://github.com/ros-visualization/rqt_plot/issues/13>`_)
+
 0.4.8 (2017-04-24)
 ------------------
 * add scroll area when showing images with 1-to-1 mapping (`#433 <https://github.com/ros-visualization/rqt_common_plugins/issues/433>`_)
