@@ -56,6 +56,9 @@ def get_plot_fields(topic_name):
 
     slot_type, is_array, array_size = roslib.msgs.parse_type(topic_type)
     field_class = roslib.message.get_message_class(slot_type)
+    if field_class is None:
+        message = "type of topic %s is unknown" % (topic_name)
+        return [], message
 
     fields = [f for f in field_name.split('/') if f]
 
