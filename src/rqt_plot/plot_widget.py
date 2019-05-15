@@ -54,12 +54,12 @@ def _parse_type(topic_type_str):
     if array_idx < 0:
         return slot_type, False, None
 
-    end_array_idx = topic_type_str.find(']', start=array_idx + 1)
+    end_array_idx = topic_type_str.find(']', array_idx + 1)
     if end_array_idx < 0:
         return None, False, None
 
     slot_type = topic_type_str[:array_idx]
-    array_size_str = topic_type_str[array_idx + 1, end_array_idx]
+    array_size_str = topic_type_str[array_idx + 1 : end_array_idx]
     try:
         array_size = int(array_size_str)
         return slot_type, True, array_size
