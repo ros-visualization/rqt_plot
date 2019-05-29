@@ -38,6 +38,7 @@ import sys
 import threading
 import time
 
+from rclpy.qos import QoSProfile
 from rqt_py_common.message_helpers import get_message_class
 from std_msgs.msg import Bool
 from python_qt_binding.QtCore import qWarning
@@ -101,7 +102,8 @@ class ROSData(object):
         if topic_type is not None:
             self.field_evals = generate_field_evals(fields)
             data_class = get_message_class(topic_type)
-            self.sub = node.create_subscription(data_class, real_topic, self._ros_cb)
+            self.sub = node.create_subscription(
+                data_class, real_topic, self._ros_cb, qos_profile=QoSProfile(depth=10))
         else:
             self.error = RosPlotException("Can not resolve topic type of %s" % topic)
 
