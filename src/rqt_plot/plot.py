@@ -121,8 +121,6 @@ class Plot(Plugin):
                     c_topics.extend(["%s/%s" % (base, f) for f in fields if f])
                 else:
                     c_topics.append(sub_t)
-            # 1053: resolve command-line topic names
-            topics, topic_types = self._node.get_topic_names_and_types()
 
             c_topics = [self._resolve_topic_name('rqt_plot', n) for n in c_topics]
             topic_list.extend(c_topics)
