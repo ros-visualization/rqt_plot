@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.6 (2019-06-10)
+------------------
 * fix exception when passing topic name (`#33 <https://github.com/ros-visualization/rqt_plot/issues/33>`_)
 
 1.0.2 (2018-12-13)
