@@ -158,8 +158,9 @@ class MatDataPlot(QWidget):
         self._canvas.axes.legend(handles, labels, loc='upper left')
 
     def set_values(self, curve, data_x, data_y):
-        line = self._curves[curve]
-        line.set_data(data_x, data_y)
+        line = self._curves.get(curve)
+        if line is not None:
+            line.set_data(data_x, data_y)
 
     def redraw(self):
         self._canvas.axes.grid(True, color='gray')
