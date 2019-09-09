@@ -314,7 +314,11 @@ class DataPlot(QWidget):
             self._merged_autoscale()
             for curve_id in self._curves:
                 curve = self._curves[curve_id]
-                self._data_plot_widget.set_values(curve_id, curve['x'], curve['y'])
+                try:
+                    self._data_plot_widget.set_values(curve_id, curve['x'], curve['y'])
+                except KeyError:
+                    # skip curve which has been removed in the mean time
+                    pass
             self._data_plot_widget.redraw()
 
     def _get_curve(self, curve_id):
