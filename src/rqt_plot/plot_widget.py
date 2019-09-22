@@ -66,6 +66,23 @@ def _parse_type(topic_type_str):
     except ValueError as e:
         return slot_type, True, None
 
+def _parse_type_sequence(topic_type_str):
+    slot_type = topic_type_str
+    is_array = False
+
+    sequence_idx = topic_type_str.find('sequence<') + len('sequence<')
+    if sequence_idx < len('sequence<'):
+        return slot_type, is_array
+
+    end_sequence_idx = topic_type_str.find('>', sequence_idx + 1)
+    if end_sequence_idx < 0:
+        slot_type = None
+        return slot_type, is_array
+
+    slot_type = topic_type_str[sequence_idx:end_sequence_idx]
+    is_array = True
+    return slot_type, is_array
+
 
 def get_plot_fields(node, topic_name):
     topics = node.get_topic_names_and_types()
@@ -81,10 +98,6 @@ def get_plot_fields(node, topic_name):
 
     if topic_type_str is None:
         message = "no topic types found for topic %s " % (topic_name)
-        return [], message
-
-    if len(topic_name) < len(real_topic) + 1:
-        message = 'no field specified in topic name "{}"'.format(topic_name)
         return [], message
 
     field_name = topic_name[len(real_topic) + 1:]
@@ -111,7 +124,7 @@ def get_plot_fields(node, topic_name):
             message = "no field %s in topic %s" % (field_name, real_topic)
             return [], message
         slot_type = field_names_and_types[field]
-        slot_type, slot_is_array, array_size = _parse_type(slot_type)
+        slot_type, slot_is_array = _parse_type_sequence(slot_type)
         is_array = slot_is_array and field_index is None
 
         if topic_helpers.is_primitive_type(slot_type):
