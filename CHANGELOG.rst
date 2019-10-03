@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2019-10-03)
+------------------
 * fix KeyError when curves are removed concurrently (`#37 <https://github.com/ros-visualization/rqt_plot/issues/37>`_)
 
 1.0.6 (2019-06-10)
