@@ -31,6 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import re
 import time
 
 from ament_index_python.resources import get_resource
@@ -113,6 +114,14 @@ def get_plot_fields(node, topic_name):
         slot_type = field_names_and_types[field]
         slot_type, slot_is_array, array_size = _parse_type(slot_type)
         is_array = slot_is_array and field_index is None
+
+        # If the field is an array, we need to update slot_type to extract
+        # the inner type, e.g. sequence<foo_msgs/Foo> -> foo_msgs/Foo
+        # See https://design.ros2.org/articles/mapping_dds_types.html
+        if is_array:
+            sequence_inner_type_regexp = re.match('sequence<(.*)>', slot_type)
+            if sequence_inner_type_regexp:
+                slot_type = sequence_inner_type_regexp.groupdict()['slot_type']
 
         if topic_helpers.is_primitive_type(slot_type):
             field_class = topic_helpers.get_type_class(slot_type)
