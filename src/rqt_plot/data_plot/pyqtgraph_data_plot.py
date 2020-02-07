@@ -94,17 +94,8 @@ class PyQtGraphDataPlot(QWidget):
         curve_id = str(curve_id)
         if curve_id in self._curves:
             self._plot_widget.removeItem(self._curves[curve_id])
+            self._plot_widget.getPlotItem().legend.removeItem(self._curves[curve_id].name())
             del self._curves[curve_id]
-            self._update_legend()
-
-    def _update_legend(self):
-        # clear and rebuild legend (there is no remove item method for the legend...)
-        self._plot_widget.clear()
-        self._plot_widget.getPlotItem().legend.items = []
-        for curve in self._curves.values():
-            self._plot_widget.addItem(curve)
-        if self._current_vline:
-            self._plot_widget.addItem(self._current_vline)
 
     def redraw(self):
         pass
