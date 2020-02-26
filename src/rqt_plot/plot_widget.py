@@ -71,7 +71,9 @@ def get_plot_fields(node, topic_name):
     topics = node.get_topic_names_and_types()
     real_topic = None
     for name, topic_types in topics:
-        if name == topic_name[:len(name)]:
+        candidate = name.split('/')
+        desired = topic_name.split('/')
+        if candidate == desired[:len(candidate)]:
             real_topic = name
             topic_type_str = topic_types[0] if topic_types else None
             break
