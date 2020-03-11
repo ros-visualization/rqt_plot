@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.10 (2020-03-11)
+-------------------
 * bump CMake minimum version to avoid CMP0048 warning
 * add Python 3 conditional dependencies (`#41 <https://github.com/ros-visualization/rqt_plot/issues/41>`_)
 * fix KeyError when curves are removed concurrently (`#37 <https://github.com/ros-visualization/rqt_plot/issues/37>`_)
