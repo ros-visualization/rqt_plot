@@ -101,15 +101,15 @@ class MatDataPlot(QWidget):
             super(MatDataPlot.Canvas, self).__init__(Figure())
             self.axes = self.figure.add_subplot(111)
             self.axes.grid(True, color='gray')
-            self.do_tight_layout()
+            self.safe_tight_layout()
             self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             self.updateGeometry()
 
         def resizeEvent(self, event):
             super(MatDataPlot.Canvas, self).resizeEvent(event)
-            self.do_tight_layout()
+            self.safe_tight_layout()
 
-        def do_tight_layout(self):
+        def safe_tight_layout(self):
             """
             Deal with "ValueError: bottom cannot be >= top" bug in older matplotlib versions
             (before v2.2.3)
@@ -118,13 +118,11 @@ class MatDataPlot(QWidget):
                 - https://github.com/matplotlib/matplotlib/pull/10915
                 - https://github.com/ros-visualization/rqt_plot/issues/35
             """
-            if parse_version(matplotlib.__version__) < parse_version('2.2.3'):
-                try:
-                    self.figure.tight_layout()
-                except ValueError:
-                    pass
-            else:
+            try:
                 self.figure.tight_layout()
+            except ValueError:
+                if parse_version(matplotlib.__version__) >= parse_version('2.2.3'):
+                    raise
 
     limits_changed = Signal()
 
