@@ -32,11 +32,12 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-
-import string
 import sys
+
 import threading
 import time
+
+from operator import itemgetter
 
 from rclpy.qos import QoSProfile
 from rqt_py_common.message_helpers import get_message_class
@@ -47,40 +48,81 @@ from python_qt_binding.QtCore import qWarning
 class RosPlotException(Exception):
     pass
 
+def _get_nested_attribute(msg, nested_attributes):
+    value = msg
+    for attr in nested_attributes.split('/'):
+        value = getattr(value, attr)
+    return value
 
-def _get_topic_type(node, topic):
+def _get_topic_type(topic_names_and_types, path_to_field):
     """
-    subroutine for getting the topic type
+    subroutine for getting the topic type, topic name and path to field
     (nearly identical to rostopic._get_topic_type, except it returns rest of name instead of fn)
 
-    :returns: topic type, real topic name, and rest of name referenced
+    :returns: topic type, real topic name, and path_to_field
       if the topic points to a field within a topic, e.g. /rosout/msg, ``str, str, str``
     """
-    val = node.get_topic_names_and_types()
-    matches = [(t, t_types) for t, t_types in val if t == topic or topic.startswith(t + '/')]
-    for t, t_types in matches:
-        for t_type in t_types:
-            if t_type == topic:
-                return t_type, None, None
-        for t_type in t_types:
-            if t_type != '*':
-                return t_type, t, topic[len(t):]
+    # See if we can find a full match
+    matches = []
+    for (t_name, t_types) in topic_names_and_types:
+        if t_name == path_to_field:
+            for t_type in t_types:
+                matches.append((t_name, t_type))
+
+    if not matches:
+        for (t_name, t_types) in topic_names_and_types:
+            if path_to_field.startswith(t_name + '/'):
+                for t_type in t_types:
+                    matches.append((t_name, t_type))
+
+        # choose longest match first
+        matches.sort(key=itemgetter(0), reverse=True)
+
+        # try to ignore messages which don't have the field specified as part of the topic name
+        while matches:
+            t_name, t_type = matches[0]
+            msg_class = get_message_class(t_type)
+            if not msg_class:
+                # if any class is not fetchable skip ignoring any message types
+                break
+
+            msg = msg_class()
+            nested_attributes = path_to_field[len(t_name) + 1:].rstrip('/')
+            nested_attributes = nested_attributes.split('[')[0]
+            if nested_attributes == '':
+                break
+            try:
+                _get_nested_attribute(msg, nested_attributes)
+            except AttributeError:
+                # ignore this type since it does not have the requested field
+                matches.pop(0)
+                continue
+            # Select this match
+            matches = [(t_name, t_type)]
+            break
+    if matches:
+        t_name, t_type = matches[0]
+        # This is a relic from ros1 where rosgraph.names.ANYTYPE = '*'.
+        # TODO(remove)
+        if t_type == '*':
+            return None, None, None
+        return t_type, t_name, path_to_field[len(t_name):]
+
     return None, None, None
 
-
-def get_topic_type(node, topic):
+def get_topic_type(node, path_to_field):
     """
     Get the topic type (nearly identical to rostopic.get_topic_type, except it doesn't return a fn)
 
-    :returns: topic type, real topic name, and rest of name referenced
-      if the \a topic points to a field within a topic, e.g. /rosout/msg, ``str, str, str``
+    :returns: topic type, real topic name and rest of name referenced
+      if the topic points to a field within a topic, e.g. /rosout/msg, ``str, str, str``
     """
-    topic_type, real_topic, rest = _get_topic_type(node, topic)
+    topic_names_and_types = node.get_topic_names_and_types()
+    topic_type, real_topic, rest = _get_topic_type(topic_names_and_types, path_to_field)
     if topic_type:
         return topic_type, real_topic, rest
     else:
         return None, None, None
-
 
 class ROSData(object):
 

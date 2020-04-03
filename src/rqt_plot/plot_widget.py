@@ -33,6 +33,8 @@
 import os
 import time
 
+from typing import Tuple, List, ClassVar
+
 from ament_index_python.resources import get_resource
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, qWarning, Slot
@@ -40,85 +42,88 @@ from python_qt_binding.QtGui import QIcon
 from python_qt_binding.QtWidgets import QAction, QMenu, QWidget
 
 from rqt_py_common.topic_completer import TopicCompleter
-from rqt_py_common import topic_helpers, message_helpers
+from rqt_py_common import message_helpers, message_field_type_helpers
 
-from rqt_plot.rosplot import ROSData, RosPlotException
+from rqt_plot.rosplot import ROSData, RosPlotException, get_topic_type
 
+def _parse_type(topic_type_str): # -> Tuple[str, bool, int]:
+    """
+    Parses a msg type string and returns a tuple with information the type
 
-def _parse_type(topic_type_str):
+    :returns: a Tuple with the base type of the slot as a str, a bool indicating
+        if the slot is an array and an integer if it has a static or bound size
+        or if it is unbounded, then the third value is None
+
+        Strips out any array information from the topic_type_str
+
+        eg:
+            sequence<int8, 3> -> int8, true, 3
+            sequence<int8>    -> int8, true, None
+            int8[3]           -> int8, true, 3
+
+    :rtype: str, bool, int
+    """
+    if not topic_type_str:
+        raise MsgSpecException("Invalid empty type")
+
     slot_type = topic_type_str
     is_array = False
     array_size = None
 
-    array_idx = topic_type_str.find('[')
-    if array_idx < 0:
-        return slot_type, False, None
+    topic_type_info = message_field_type_helpers.MessageFieldTypeInfo(topic_type_str)
+    slot_type = topic_type_info.base_type_str
+    is_array = topic_type_info.is_array
 
-    end_array_idx = topic_type_str.find(']', array_idx + 1)
-    if end_array_idx < 0:
-        return None, False, None
+    if topic_type_info.is_static_array:
+        array_size = topic_type_info.static_array_size
 
-    slot_type = topic_type_str[:array_idx]
-    array_size_str = topic_type_str[array_idx + 1 : end_array_idx]
-    try:
-        array_size = int(array_size_str)
-        return slot_type, True, array_size
-    except ValueError as e:
-        return slot_type, True, None
+    if topic_type_info.is_bounded_array:
+        array_size = topic_type_info.bounded_array_size
 
+    if topic_type_info.is_unbounded_array:
+        array_size = None
+
+    return slot_type, is_array, array_size
 
 def get_plot_fields(node, topic_name):
-    topics = node.get_topic_names_and_types()
-    real_topic = None
-    for name, topic_types in topics:
-        if name == topic_name[:len(name)]:
-            real_topic = name
-            topic_type_str = topic_types[0] if topic_types else None
-            break
-    if real_topic is None:
+    topic_type, real_topic, _ = get_topic_type(node, topic_name)
+    if topic_type is None:
         message = "topic %s does not exist" % (topic_name)
         return [], message
-
-    if topic_type_str is None:
-        message = "no topic types found for topic %s " % (topic_name)
-        return [], message
-
-    if len(topic_name) < len(real_topic) + 1:
-        message = 'no field specified in topic name "{}"'.format(topic_name)
-        return [], message
-
     field_name = topic_name[len(real_topic) + 1:]
 
-    message_class = message_helpers.get_message_class(topic_type_str)
-    if message_class is None:
-        message = 'message class "{}" is invalid'.format(topic_type_str)
+    slot_type, is_array, array_size = _parse_type(topic_type)
+    field_class = message_helpers.get_message_class(slot_type)
+    if field_class is None:
+        message = "type of topic %s is unknown" % (topic_name)
         return [], message
 
-    slot_type, is_array, array_size = _parse_type(topic_type_str)
-    field_class = message_helpers.get_message_class(slot_type)
-
+    # Go through the fields until you reach the last msg field
     fields = [f for f in field_name.split('/') if f]
-
     for field in fields:
         # parse the field name for an array index
-        field, _, field_index = _parse_type(field)
-        if field is None:
+        try:
+            field, _, field_index = _parse_type(field)
+        except roslib.msgs.MsgSpecException:
             message = "invalid field %s in topic %s" % (field, real_topic)
             return [], message
 
-        field_names_and_types = field_class.get_fields_and_field_types()
-        if field not in field_names_and_types:
+        if not hasattr(field_class, "get_fields_and_field_types"):
+            msg = "Invalid field path %s in topic %s" % (field_name, real_topic)
+            return [], msg
+
+        fields_and_field_types = field_class.get_fields_and_field_types()
+        if field not in fields_and_field_types.keys() :
             message = "no field %s in topic %s" % (field_name, real_topic)
             return [], message
-        slot_type = field_names_and_types[field]
+
+        slot_type = fields_and_field_types[field]
         slot_type, slot_is_array, array_size = _parse_type(slot_type)
         is_array = slot_is_array and field_index is None
 
-        if topic_helpers.is_primitive_type(slot_type):
-            field_class = topic_helpers.get_type_class(slot_type)
-        else:
-            field_class = message_helpers.get_message_class(slot_type)
+        field_class = message_field_type_helpers.get_type_class(slot_type)
 
+    # TODO: add bytes to this as you could treat bytes as an array of uint
     if field_class in (int, float, bool):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
         if is_array:
@@ -132,11 +137,13 @@ def get_plot_fields(node, topic_name):
             message = "topic %s is %s" % (topic_name, topic_kind)
             return [topic_name], message
     else:
-        if not topic_helpers.is_primitive_type(slot_type):
+        if not message_field_type_helpers.is_primitive_type(slot_type):
             numeric_fields = []
-            for slot, slot_type in field_class.get_fields_and_field_types().items():
+            fields_and_field_types = field_class.get_fields_and_field_types()
+            for i, slot in enumerate(fields_and_field_types.keys()):
+                slot_type = fields_and_field_types[slot]
                 slot_type, is_array, array_size = _parse_type(slot_type)
-                slot_class = topic_helpers.get_type_class(slot_type)
+                slot_class = message_field_type_helpers.get_type_class(slot_type)
                 if slot_class in (int, float) and not is_array:
                     numeric_fields.append(slot)
             message = ""
@@ -323,7 +330,12 @@ class PlotWidget(QWidget):
 
     def add_topic(self, topic_name):
         topics_changed = False
-        for topic_name in get_plot_fields(self._node, topic_name)[0]:
+        topics, msg = get_plot_fields(self._node, topic_name)
+        if len(topics) == 0:
+            qWarning("get_plot_fields failed with msg: %s" % msg)
+            return
+
+        for topic_name in topics:
             if topic_name in self._rosdata:
                 qWarning('PlotWidget.add_topic(): topic already subscribed: %s' % topic_name)
                 continue
