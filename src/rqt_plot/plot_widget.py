@@ -46,6 +46,9 @@ from rqt_py_common import message_helpers, message_field_type_helpers
 
 from rqt_plot.rosplot import ROSData, RosPlotException, get_topic_type
 
+class MsgSpecException(Exception):
+    pass
+
 def _parse_type(topic_type_str): # -> Tuple[str, bool, int]:
     """
     Parses a msg type string and returns a tuple with information the type
@@ -77,10 +80,10 @@ def _parse_type(topic_type_str): # -> Tuple[str, bool, int]:
     if topic_type_info.is_static_array:
         array_size = topic_type_info.static_array_size
 
-    if topic_type_info.is_bounded_array:
+    elif topic_type_info.is_bounded_array:
         array_size = topic_type_info.bounded_array_size
 
-    if topic_type_info.is_unbounded_array:
+    elif topic_type_info.is_unbounded_array:
         array_size = None
 
     return slot_type, is_array, array_size
@@ -92,19 +95,24 @@ def get_plot_fields(node, topic_name):
         return [], message
     field_name = topic_name[len(real_topic) + 1:]
 
-    slot_type, is_array, array_size = _parse_type(topic_type)
+    is_array = False
+    array_size = None
+    slot_type = topic_type
+
     field_class = message_helpers.get_message_class(slot_type)
     if field_class is None:
         message = "type of topic %s is unknown" % (topic_name)
         return [], message
 
+    field_index = None
     # Go through the fields until you reach the last msg field
     fields = [f for f in field_name.split('/') if f]
     for field in fields:
         # parse the field name for an array index
         try:
-            field, _, field_index = _parse_type(field)
-        except roslib.msgs.MsgSpecException:
+            field, _, field_index = \
+                message_field_type_helpers.separate_field_from_array_information(field)
+        except MsgSpecException:
             message = "invalid field %s in topic %s" % (field, real_topic)
             return [], message
 
@@ -119,7 +127,7 @@ def get_plot_fields(node, topic_name):
 
         slot_type = fields_and_field_types[field]
         slot_type, slot_is_array, array_size = _parse_type(slot_type)
-        is_array = slot_is_array and field_index is None
+        is_array = slot_is_array
 
         field_class = message_field_type_helpers.get_type_class(slot_type)
 
@@ -128,14 +136,20 @@ def get_plot_fields(node, topic_name):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
         if is_array:
             if array_size is not None:
-                message = "topic %s is fixed-size %s array" % (topic_name, topic_kind)
-                return ["%s[%d]" % (topic_name, i) for i in range(array_size)], message
+                msg = "topic %s is fixed-size %s array" % (topic_name, topic_kind)
+                return ["%s[%d]" % (topic_name, i) for i in range(array_size)], msg
             else:
-                message = "topic %s is variable-size %s array" % (topic_name, topic_kind)
-                return [], message
+                if field_index is not None:
+                    msg = "topic %s is variable-size %s array with ix %d" % (
+                        topic_name, topic_kind, field_index
+                    )
+                    return [topic_name], msg
+                else:
+                    msg = "topic %s is variable-size %s array" % (topic_name, topic_kind)
+                    return [], msg
         else:
-            message = "topic %s is %s" % (topic_name, topic_kind)
-            return [topic_name], message
+            msg = "topic %s is %s" % (topic_name, topic_kind)
+            return [topic_name], msg
     else:
         if not message_field_type_helpers.is_primitive_type(slot_type):
             numeric_fields = []
