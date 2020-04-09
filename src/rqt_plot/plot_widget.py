@@ -131,7 +131,6 @@ def get_plot_fields(node, topic_name):
 
         field_class = message_field_type_helpers.get_type_class(slot_type)
 
-    # TODO: add bytes to this as you could treat bytes as an array of uint
     if field_class in (int, float, bool):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
         if is_array:
