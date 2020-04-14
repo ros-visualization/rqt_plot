@@ -116,10 +116,12 @@ def get_plot_fields(node, topic_name):
             message = "invalid field %s in topic %s" % (field, real_topic)
             return [], message
 
+        # If it is not a generated msg type
         if not hasattr(field_class, "get_fields_and_field_types"):
             msg = "Invalid field path %s in topic %s" % (field_name, real_topic)
             return [], msg
 
+        # Find the field in the fields of field_class
         fields_and_field_types = field_class.get_fields_and_field_types()
         if field not in fields_and_field_types.keys() :
             message = "no field %s in topic %s" % (field_name, real_topic)
@@ -129,7 +131,8 @@ def get_plot_fields(node, topic_name):
         slot_type, slot_is_array, array_size = _parse_type(slot_type)
         is_array = slot_is_array
 
-        field_class = message_field_type_helpers.get_type_class(slot_type)
+        field_class = message_field_type_helpers.get_field_python_class(
+            slot_type)
 
     if field_class in (int, float, bool):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
@@ -156,7 +159,8 @@ def get_plot_fields(node, topic_name):
             for i, slot in enumerate(fields_and_field_types.keys()):
                 slot_type = fields_and_field_types[slot]
                 slot_type, is_array, array_size = _parse_type(slot_type)
-                slot_class = message_field_type_helpers.get_type_class(slot_type)
+                slot_class = \
+                    message_field_type_helpers.get_field_python_class(slot_type)
                 if slot_class in (int, float) and not is_array:
                     numeric_fields.append(slot)
             message = ""
