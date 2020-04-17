@@ -42,7 +42,7 @@ from python_qt_binding.QtGui import QIcon
 from python_qt_binding.QtWidgets import QAction, QMenu, QWidget
 
 from rqt_py_common.topic_completer import TopicCompleter
-from rqt_py_common import message_helpers, message_field_type_helpers
+from rqt_py_common import message_helpers, message_field_type_helpers, topic_helpers
 
 from rqt_plot.rosplot import ROSData, RosPlotException, get_topic_type
 
@@ -111,7 +111,7 @@ def get_plot_fields(node, topic_name):
         # parse the field name for an array index
         try:
             field, _, field_index = \
-                message_field_type_helpers.separate_field_from_array_information(field)
+                topic_helpers.separate_field_from_array_information(field)
         except MsgSpecException:
             message = "invalid field %s in topic %s" % (field, real_topic)
             return [], message
