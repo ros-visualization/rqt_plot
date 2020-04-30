@@ -236,7 +236,7 @@ def generate_field_evals(fields):
         fields = [f for f in fields.split('/') if f]
         for f in fields:
             if '[' in f:
-                field_name, rest = f.split('[')
+                field_name, rest = f.split('[', maxsplit=1)
                 slot_num = int(rest[:rest.find(']')])
                 evals.append(_array_eval(field_name, slot_num))
             else:

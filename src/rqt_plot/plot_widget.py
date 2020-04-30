@@ -138,8 +138,14 @@ def get_plot_fields(node, topic_name):
         topic_kind = 'boolean' if field_class == bool else 'numeric'
         if is_array:
             if array_size is not None:
-                msg = "topic %s is fixed-size %s array" % (topic_name, topic_kind)
-                return ["%s[%d]" % (topic_name, i) for i in range(array_size)], msg
+                if field_index is None:
+                    msg = "topic %s is a fixed-size %s array" % (topic_name, topic_kind)
+                    return ["%s[%d]" % (topic_name, i) for i in range(array_size)], msg
+                else:
+                    msg = "topic %s is a fixed-size %s array with ix: %s" % (
+                        topic_name, topic_kind, field_index
+                    )
+                    return [topic_name], msg
             else:
                 if field_index is not None:
                     msg = "topic %s is variable-size %s array with ix %d" % (
@@ -345,9 +351,9 @@ class PlotWidget(QWidget):
 
         self.remove_topic_button.setMenu(self._remove_topic_menu)
 
-    def add_topic(self, topic_name):
+    def add_topic(self, field_path):
         topics_changed = False
-        topics, msg = get_plot_fields(self._node, topic_name)
+        topics, msg = get_plot_fields(self._node, field_path)
         if len(topics) == 0:
             qWarning("get_plot_fields failed with msg: %s" % msg)
             return
