@@ -134,6 +134,7 @@ class MatDataPlot(QWidget):
         vbox.addWidget(self._toolbar)
         vbox.addWidget(self._canvas)
         self.setLayout(vbox)
+        self.setMinimumSize(self.layout().minimumSize().width() + 1, self.layout().minimumSize().height() + 1 )
 
         self._curves = {}
         self._current_vline = None
