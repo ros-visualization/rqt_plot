@@ -198,7 +198,7 @@ def generate_field_evals(fields):
         for f in fields:
             if '[' in f:
                 field_name, rest = f.split('[')
-                slot_num = string.atoi(rest[:rest.find(']')])
+                slot_num = int(rest[:rest.find(']')])
                 evals.append(_array_eval(field_name, slot_num))
             else:
                 evals.append(_field_eval(f))
