@@ -28,7 +28,8 @@ setup(
         'Topic :: Software Development',
     ],
     description=(
-        'RQT plugin for monitoring ROS processes.'
+        'rqt_plot provides a GUI plugin visualizing numeric values in a 2D plot ' +
+        'using different plotting backends.'
     ),
     license='BSD',
     entry_points={
