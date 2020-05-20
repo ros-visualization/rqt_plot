@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use catkin_install_python() (`#59 <https://github.com/ros-visualization/rqt_plot/issues/59>`_)
+* fix "bottom cannot be >= top" matplotlib error (`#52 <https://github.com/ros-visualization/rqt_plot/issues/52>`_)
+
 0.4.10 (2020-03-11)
 -------------------
 * bump CMake minimum version to avoid CMP0048 warning
