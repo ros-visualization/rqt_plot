@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.11 (2020-05-20)
+-------------------
 * use catkin_install_python() (`#59 <https://github.com/ros-visualization/rqt_plot/issues/59>`_)
 * fix "bottom cannot be >= top" matplotlib error (`#52 <https://github.com/ros-visualization/rqt_plot/issues/52>`_)
 
