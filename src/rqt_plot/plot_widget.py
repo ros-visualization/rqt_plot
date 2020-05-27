@@ -168,6 +168,13 @@ class PlotWidget(QWidget):
         _, package_path = get_resource('packages', 'rqt_plot')
         ui_file = os.path.join(package_path, 'share', 'rqt_plot', 'resource', 'plot.ui')
         loadUi(ui_file, self)
+
+        icon_paths = QIcon.themeSearchPaths()
+        icon_paths.append(os.path.join(
+            package_path, 'share', 'rqt_plot', 'resource', 'icons', 'rqt_icons'))
+        QIcon.setThemeSearchPaths(icon_paths)
+        QIcon.setThemeName('rqt_icons')
+
         self.subscribe_topic_button.setIcon(QIcon.fromTheme('list-add'))
         self.remove_topic_button.setIcon(QIcon.fromTheme('list-remove'))
         self.pause_button.setIcon(QIcon.fromTheme('media-playback-pause'))
