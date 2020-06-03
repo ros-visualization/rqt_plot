@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.8 (2020-06-02)
+------------------
+* Fix `#35 <https://github.com/ros-visualization/rqt_plot/issues/35>`_ - "bottom cannot be >= top" matplotlib error (`#52 <https://github.com/ros-visualization/rqt_plot/issues/52>`_)
+* Contributors: Nikos Koukis
+
 1.0.7 (2019-10-03)
 ------------------
 * fix KeyError when curves are removed concurrently (`#37 <https://github.com/ros-visualization/rqt_plot/issues/37>`_)
