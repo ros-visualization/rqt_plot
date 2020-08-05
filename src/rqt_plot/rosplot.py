@@ -33,7 +33,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-import string
 import sys
 import threading
 import time
