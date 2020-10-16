@@ -2,7 +2,8 @@
   <name>rqt_plot</name>
   <version>1.0.8</version>
   <description>rqt_plot provides a GUI plugin visualizing numeric values in a 2D plot using different plotting backends.</description>
-  <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
+  <maintainer email="mabel@openrobotics.org">Mabel Zhang</maintainer>
+  <maintainer email="logans@cottsay.net">Scott K Logan</maintainer>
   <maintainer email="scholz@sim.tu-darmstadt.de">Dorian Scholz</maintainer>
   <maintainer email="namniart@gmail.com">Austin Hendrix</maintainer>
 
@@ -13,6 +14,7 @@
   <url type="bugtracker">https://github.com/ros-visualization/rqt_plot/issues</url>
 
   <author>Dorian Scholz</author>
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
