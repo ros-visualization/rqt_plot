@@ -103,6 +103,7 @@ class MatDataPlot(QWidget):
             self.axes.grid(True, color='gray')
             self.safe_tight_layout()
             self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.setMinimumSize(1,1)
             self.updateGeometry()
 
         def resizeEvent(self, event):
