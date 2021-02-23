@@ -2,6 +2,13 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix resize bug. Set minimum size of MatDataPlot's Canvas (`#69 <https://github.com/ros-visualization/rqt_plot/issues/69>`_)
+* Update maintainers
+* Replace string.atoi with int() (`#57 <https://github.com/ros-visualization/rqt_plot/issues/57>`_)
+* Contributors: Felix Exner, Mabel Zhang, Robert Haschke
+
 0.4.12 (2020-05-22)
 -------------------
 * readd rqt_plot global executable, regression from 0.4.11 (`#60 <https://github.com/ros-visualization/rqt_plot/issues/60>`_)
