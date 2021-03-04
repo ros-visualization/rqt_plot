@@ -39,7 +39,7 @@ import threading
 import time
 
 from rclpy.qos import QoSProfile
-from rqt_py_common.message_helpers import get_message_class
+from rosidl_runtime_py.utilities import get_message
 from std_msgs.msg import Bool
 from python_qt_binding.QtCore import qWarning
 
@@ -101,7 +101,7 @@ class ROSData(object):
         topic_type, real_topic, fields = get_topic_type(node, topic)
         if topic_type is not None:
             self.field_evals = generate_field_evals(fields)
-            data_class = get_message_class(topic_type)
+            data_class = get_message(topic_type)
             self.sub = node.create_subscription(
                 data_class, real_topic, self._ros_cb, qos_profile=QoSProfile(depth=10))
         else:
