@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.9 (2021-03-05)
+------------------
 * Fix plots of array items (`#71 <https://github.com/ros-visualization/rqt_plot/issues/71>`_)
 * Update maintainers
 * Contributors: Ivan Santiago Paunovic, Mabel Zhang
