@@ -56,15 +56,19 @@ from rqt_py_common.topic_completer import TopicCompleter
 
 from rqt_plot.rosplot import ROSData, RosPlotException
 
-ARRAY_TYPE_REGEX = re.compile(r'(.*)\[(.*)\]')
+ARRAY_TYPE_REGEX = re.compile(r'(.+)\[(.*)\]')
 
-def _parse_field_name(type_str):
-    # Returns name, has_index, array_index
-    m = ARRAY_TYPE_REGEX.match(type_str)
+def _parse_field_name_and_index(field_name):
+    # Field names may be indexed, e.g. `my_field[2]`.
+    # This parses the actual name and index from the indexed name and returns `field_name, index`.
+    # If not indexed, returns `field_name, None`.
+    m = ARRAY_TYPE_REGEX.match(field_name)
     if m:
-        return m.group(1), bool(m), int(m.group(2))
-    else:
-        return type_str, False, None
+        try:
+            return m.group(1), int(m.group(2))
+        except ValueError:
+            pass
+    return field_name, None
 
 
 def get_plot_fields(node, topic_name):
@@ -102,14 +106,10 @@ def get_plot_fields(node, topic_name):
 
     while next_field is not None:
         parsed_fields.append(next_field)
-        # parse the field name for an array index
+        name, index = _parse_field_name_and_index(next_field)
+        has_index = index is not None
         base_error_msg = f"trying to parse field '{'.'.join(parsed_fields)}' of topic {real_topic}: "
-        no_field_error_msg = base_error_msg + "'{name}' is not a field of" f" '{topic_type_str}'"
-        try:
-            name, has_index, index = _parse_field_name(next_field)
-        except (ValueError, KeyError):
-            return [], no_field_error_msg.format(name=next_field)
-        no_field_error_msg = no_field_error_msg.format(name=name)
+        no_field_error_msg = base_error_msg + f"'{name}' is not a field of '{topic_type_str}'"
 
         try:
             slot_index = current_message_class.__slots__.index(f'_{name}')
