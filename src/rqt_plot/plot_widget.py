@@ -31,6 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import re
 import time
 
 from ament_index_python.resources import get_resource
@@ -39,32 +40,35 @@ from python_qt_binding.QtCore import Qt, QTimer, qWarning, Slot
 from python_qt_binding.QtGui import QIcon
 from python_qt_binding.QtWidgets import QAction, QMenu, QWidget
 
+from rosidl_parser.definition import AbstractGenericString
+from rosidl_parser.definition import AbstractNestedType
+from rosidl_parser.definition import AbstractSequence
+from rosidl_parser.definition import Array
+from rosidl_parser.definition import BasicType
+from rosidl_parser.definition import BOOLEAN_TYPE
+from rosidl_parser.definition import NamespacedType
+
+from rosidl_runtime_py.utilities import get_message
+from rosidl_runtime_py.utilities import get_message_namespaced_type
+from rosidl_runtime_py import import_message_from_namespaced_type
+
 from rqt_py_common.topic_completer import TopicCompleter
-from rqt_py_common import topic_helpers, message_helpers
 
 from rqt_plot.rosplot import ROSData, RosPlotException
 
+ARRAY_TYPE_REGEX = re.compile(r'(.+)\[(.*)\]')
 
-def _parse_type(topic_type_str):
-    slot_type = topic_type_str
-    is_array = False
-    array_size = None
-
-    array_idx = topic_type_str.find('[')
-    if array_idx < 0:
-        return slot_type, False, None
-
-    end_array_idx = topic_type_str.find(']', array_idx + 1)
-    if end_array_idx < 0:
-        return None, False, None
-
-    slot_type = topic_type_str[:array_idx]
-    array_size_str = topic_type_str[array_idx + 1 : end_array_idx]
-    try:
-        array_size = int(array_size_str)
-        return slot_type, True, array_size
-    except ValueError as e:
-        return slot_type, True, None
+def _parse_field_name_and_index(field_name):
+    # Field names may be indexed, e.g. `my_field[2]`.
+    # This parses the actual name and index from the indexed name and returns `field_name, index`.
+    # If not indexed, returns `field_name, None`.
+    m = ARRAY_TYPE_REGEX.match(field_name)
+    if m:
+        try:
+            return m.group(1), int(m.group(2))
+        except ValueError:
+            pass
+    return field_name, None
 
 
 def get_plot_fields(node, topic_name):
@@ -87,67 +91,82 @@ def get_plot_fields(node, topic_name):
         message = 'no field specified in topic name "{}"'.format(topic_name)
         return [], message
 
-    field_name = topic_name[len(real_topic) + 1:]
+    nested_field_path = topic_name[len(real_topic) + 1:]
 
-    message_class = message_helpers.get_message_class(topic_type_str)
+    message_class = get_message(topic_type_str)
     if message_class is None:
         message = 'message class "{}" is invalid'.format(topic_type_str)
         return [], message
 
-    slot_type, is_array, array_size = _parse_type(topic_type_str)
-    field_class = message_helpers.get_message_class(slot_type)
+    nested_fields = iter(f for f in nested_field_path.split('/') if f)
+    current_type = get_message_namespaced_type(topic_type_str)
+    current_message_class = message_class
+    next_field = next(nested_fields, None)
+    parsed_fields = []
 
-    fields = [f for f in field_name.split('/') if f]
+    while next_field is not None:
+        parsed_fields.append(next_field)
+        name, index = _parse_field_name_and_index(next_field)
+        has_index = index is not None
+        base_error_msg = f"trying to parse field '{'.'.join(parsed_fields)}' of topic {real_topic}: "
+        no_field_error_msg = base_error_msg + f"'{name}' is not a field of '{topic_type_str}'"
 
-    for field in fields:
-        # parse the field name for an array index
-        field, _, field_index = _parse_type(field)
-        if field is None:
-            message = "invalid field %s in topic %s" % (field, real_topic)
-            return [], message
+        try:
+            slot_index = current_message_class.__slots__.index(f'_{name}')
+        except ValueError:
+            return [], no_field_error_msg
+        current_type = current_message_class.SLOT_TYPES[slot_index]
+        is_array_or_sequence = isinstance(current_type, AbstractNestedType)
 
-        field_names_and_types = field_class.get_fields_and_field_types()
-        if field not in field_names_and_types:
-            message = "no field %s in topic %s" % (field_name, real_topic)
-            return [], message
-        slot_type = field_names_and_types[field]
-        slot_type, slot_is_array, array_size = _parse_type(slot_type)
-        is_array = slot_is_array and field_index is None
+        if is_array_or_sequence:
+            if not has_index:
+                return [], base_error_msg + f'{name} is a nested type but not index provided'
+            if current_type.has_maximum_size():
+                if index >= current_type.maximum_size:
+                    return [], (
+                        base_error_msg +
+                        f"index '{index}' out of bounds, maximum size is {current_type.maximum_size}")
+            current_type = current_type.value_type
+        elif has_index:
+            return [], base_error_msg + "{name} is not an array or sequence"
 
-        if topic_helpers.is_primitive_type(slot_type):
-            field_class = topic_helpers.get_type_class(slot_type)
-        else:
-            field_class = message_helpers.get_message_class(slot_type)
+        if not isinstance(current_type, NamespacedType):
+            break
+        current_message_class = import_message_from_namespaced_type(current_type)
+        next_field = next(nested_fields, None)
 
-    if field_class in (int, float, bool):
-        topic_kind = 'boolean' if field_class == bool else 'numeric'
-        if is_array:
-            if array_size is not None:
-                message = "topic %s is fixed-size %s array" % (topic_name, topic_kind)
-                return ["%s[%d]" % (topic_name, i) for i in range(array_size)], message
-            else:
-                message = "topic %s is variable-size %s array" % (topic_name, topic_kind)
-                return [], message
-        else:
-            message = "topic %s is %s" % (topic_name, topic_kind)
-            return [topic_name], message
-    else:
-        if not topic_helpers.is_primitive_type(slot_type):
-            numeric_fields = []
-            for slot, slot_type in field_class.get_fields_and_field_types().items():
-                slot_type, is_array, array_size = _parse_type(slot_type)
-                slot_class = topic_helpers.get_type_class(slot_type)
-                if slot_class in (int, float) and not is_array:
-                    numeric_fields.append(slot)
-            message = ""
-            if len(numeric_fields) > 0:
-                message = "%d plottable fields in %s" % (len(numeric_fields), topic_name)
-            else:
-                message = "No plottable fields in %s" % (topic_name)
-            return ["%s/%s" % (topic_name, f) for f in numeric_fields], message
-        else:
-            message = "Topic %s is not numeric" % (topic_name)
-            return [], message
+    try:
+        next_field = next(nested_fields)
+        return [], f"'{'.'.join(parsed_fields)}' is a primitive type with no field named '{next_field}'"
+    except StopIteration:
+        pass
+
+    if isinstance(current_type, AbstractGenericString):
+        return [], f"'{topic_name}' is a string, which cannot be plotted"
+    if isinstance(current_type, AbstractSequence):
+        return [], f"'{topic_name}' is a sequence, which cannot be plotted"
+    if isinstance(current_type, Array):
+        return (
+            [f'{topic_name}[{i}]' for i in range(field_class.maximum_size)],
+            f"'{topic_name}' is a fixed size array")
+    if isinstance(current_type, NamespacedType):
+        plottable_fields = []
+        current_message_class = import_message_from_namespaced_type(current_type)
+        for n_field, n_current_type in zip(
+            current_message_class.__slots__, current_message_class.SLOT_TYPES
+        ):
+            if isinstance(n_current_type, BasicType):
+                plottable_fields.append(n_field[1:])
+        if plottable_fields:
+            return (
+                [f'{topic_name}/{field}' for field in plottable_fields],
+                f"{len(plottable_fields)} plottable fields in '{topic_name}'"
+            )
+    if not isinstance(current_type, BasicType):
+        return [], f"{topic_name} cannot be plotted"
+
+    data_kind = 'boolean' if current_type.typename == BOOLEAN_TYPE else 'numeric'
+    return [topic_name], f"topic '{topic_name}' is {data_kind}"
 
 
 def is_plottable(node, topic_name):
