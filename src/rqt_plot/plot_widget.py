@@ -142,7 +142,7 @@ def get_plot_fields(node, topic_name):
         pass
 
     if isinstance(current_type, AbstractGenericString):
-        return [], f"'{topic_name}' is a string, which cannot be printed"
+        return [], f"'{topic_name}' is a string, which cannot be plotted"
     if isinstance(current_type, AbstractSequence):
         return [], f"'{topic_name}' is a sequence, which cannot be printed"
     if isinstance(current_type, Array):
