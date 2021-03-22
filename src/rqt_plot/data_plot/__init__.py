@@ -111,6 +111,9 @@ class DataPlot(QWidget):
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 255)
 
+    DEFAULT_X_LIMITS = (0.0, 10.0)
+    DEFAULT_Y_LIMITS = (-0.001, 0.001)
+
     SCALE_ALL = 1
     SCALE_VISIBLE = 2
     SCALE_EXTEND = 4
@@ -186,8 +189,8 @@ class DataPlot(QWidget):
             self._data_plot_widget.close()
             self._data_plot_widget = None
         else:
-            x_limits = [0.0, 10.0]
-            y_limits = [-0.001, 0.001]
+            x_limits = self.DEFAULT_X_LIMITS
+            y_limits = self.DEFAULT_Y_LIMITS
 
         self._data_plot_widget = selected_plot['widget_class'](self)
         self._data_plot_widget.limits_changed.connect(self.limits_changed)
@@ -472,9 +475,9 @@ class DataPlot(QWidget):
 
         # set sane limits if our limits are infinite
         if numpy.isinf(x_limit[0]):
-            x_limit[0] = 0.0
+            x_limit[0] = self.DEFAULT_X_LIMITS[0]
         if numpy.isinf(x_limit[1]):
-            x_limit[1] = 1.0
+            x_limit[1] = self.DEFAULT_X_LIMITS[1]
 
         y_limit = [numpy.inf, -numpy.inf]
         if self._autoscale_y:
@@ -519,9 +522,9 @@ class DataPlot(QWidget):
 
         # set sane limits if our limits are infinite
         if numpy.isinf(y_limit[0]):
-            y_limit[0] = 0.0
+            y_limit[0] = self.DEFAULT_Y_LIMITS[0]
         if numpy.isinf(y_limit[1]):
-            y_limit[1] = 1.0
+            y_limit[1] = self.DEFAULT_Y_LIMITS[1]
 
         self.set_xlim(x_limit)
         self.set_ylim(y_limit)
@@ -532,7 +535,7 @@ class DataPlot(QWidget):
             return self._data_plot_widget.get_xlim()
         else:
             qWarning("No plot widget; returning default X limits")
-            return [0.0, 1.0]
+            return self.DEFAULT_X_LIMITS
 
     def set_xlim(self, limits):
         """set X limits"""
@@ -547,7 +550,7 @@ class DataPlot(QWidget):
             return self._data_plot_widget.get_ylim()
         else:
             qWarning("No plot widget; returning default Y limits")
-            return [0.0, 10.0]
+            return self.DEFAULT_Y_LIMITS
 
     def set_ylim(self, limits):
         """set Y limits"""
