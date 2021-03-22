@@ -73,12 +73,13 @@ class PyQtGraphDataPlot(QWidget):
         vbox.addWidget(self._plot_widget)
         self.setLayout(vbox)
         self._plot_widget.getPlotItem().sigRangeChanged.connect(self.limits_changed)
+        self._plot_widget.showGrid(x=True, y=True, alpha=1.0)
 
         self._curves = {}
         self._current_vline = None
 
     def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
-        pen = mkPen(curve_color, width=1)
+        pen = mkPen(curve_color, width=2)
         symbol = "o"
         symbolPen = mkPen(QColor(Qt.black))
         symbolBrush = mkBrush(curve_color)
