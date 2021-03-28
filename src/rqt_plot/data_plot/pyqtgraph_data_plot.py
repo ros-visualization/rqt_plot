@@ -32,7 +32,7 @@
 
 from python_qt_binding.QtCore import Slot, Qt, qVersion, qWarning, Signal
 from python_qt_binding.QtGui import QColor
-from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
+from python_qt_binding.QtWidgets import QAction, QSpinBox, QVBoxLayout, QWidget
 
 if qVersion().startswith('5.'):
     try:
@@ -69,6 +69,8 @@ class PyQtGraphDataPlot(QWidget):
         self._plot_widget.getPlotItem().addLegend()
         self._plot_widget.setBackground((255, 255, 255))
         self._plot_widget.setXRange(0, 10, padding=0)
+        self._line_width = 1
+        self._add_line_width_menu_option()
         vbox = QVBoxLayout()
         vbox.addWidget(self._plot_widget)
         self.setLayout(vbox)
@@ -78,7 +80,7 @@ class PyQtGraphDataPlot(QWidget):
         self._current_vline = None
 
     def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
-        pen = mkPen(curve_color, width=1)
+        pen = mkPen(curve_color, width=self._line_width)
         symbol = "o"
         symbolPen = mkPen(QColor(Qt.black))
         symbolBrush = mkBrush(curve_color)
@@ -106,6 +108,21 @@ class PyQtGraphDataPlot(QWidget):
         if self._current_vline:
             self._plot_widget.addItem(self._current_vline)
 
+    def _add_line_width_menu_option(self):
+        menu = self._plot_widget.getMenu().addMenu('Line Width')
+        menu.setLayout(QVBoxLayout())
+        self._line_width_spinbox = QSpinBox()
+        self._line_width_spinbox.setRange(1, 30)
+        self._line_width_spinbox.valueChanged.connect(self._line_width_spinbox_valueChanged)
+        menu.layout().addWidget(self._line_width_spinbox)
+
+    @Slot(int)
+    def _line_width_spinbox_valueChanged(self, val):
+        self._line_width = val
+        for curve in self._curves.values():
+            color = curve.opts['pen'].color()
+            curve.setPen(mkPen(color, width=self._line_width))
+
     def redraw(self):
         pass
 
@@ -132,3 +149,17 @@ class PyQtGraphDataPlot(QWidget):
     def get_ylim(self):
         _, y_range = self._plot_widget.viewRange()
         return y_range
+
+    def save_settings(self, plugin_settings, instance_settings):
+        instance_settings.set_value('plot_widget_state', self._plot_widget.saveState())
+        instance_settings.set_value('qt_line_width', self._line_width)
+
+    def restore_settings(self, plugin_settings, instance_settings):
+        plot_widget_state = instance_settings.value('plot_widget_state')
+        if plot_widget_state is not None:
+            self._plot_widget.restoreState(plot_widget_state)
+
+        qt_line_width = instance_settings.value('qt_line_width')
+        if qt_line_width is not None:
+            self._line_width = int(qt_line_width)
+            self._line_width_spinbox.setValue(self._line_width)

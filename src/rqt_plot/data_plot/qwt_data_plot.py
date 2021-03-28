@@ -247,6 +247,12 @@ class QwtDataPlot(Qwt.QwtPlot):
     def get_ylim(self):
         return self._y_limits
 
+    def save_settings(self, plugin_settings, instance_settings):
+        pass
+
+    def restore_settings(self, plugin_settings, instance_settings):
+        pass
+
 
 if __name__ == '__main__':
     from python_qt_binding.QtGui import QApplication
