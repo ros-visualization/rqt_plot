@@ -237,6 +237,7 @@ class DataPlot(QWidget):
         ylim = [float(y) for y in ylim]
         instance_settings.set_value('x_limits', pack(xlim))
         instance_settings.set_value('y_limits', pack(ylim))
+        self._data_plot_widget.save_settings(plugin_settings, instance_settings)
 
     def restore_settings(self, plugin_settings, instance_settings):
         """Restore the settings for this widget
@@ -259,6 +260,7 @@ class DataPlot(QWidget):
                 self.set_ylim(ylim)
             except:
                 qWarning("Failed to restore Y limits")
+        self._data_plot_widget.restore_settings(plugin_settings, instance_settings)
 
     def doSettingsDialog(self):
         """Present the user with a dialog for choosing the plot backend
