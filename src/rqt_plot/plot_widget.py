@@ -45,6 +45,7 @@ from rqt_py_common.topic_completer import TopicCompleter
 from rqt_py_common import topic_helpers
 
 from . rosplot import ROSData, RosPlotException
+from .data_plot import DataPlot
 
 
 def get_plot_fields(topic_name):
@@ -160,6 +161,10 @@ class PlotWidget(QWidget):
         self.data_plot = data_plot
         self.data_plot_layout.addWidget(self.data_plot)
         self.data_plot.autoscroll(self.autoscroll_checkbox.isChecked())
+        if self.autoscale_checkbox.isChecked():
+            self.data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
+        else:
+            self.data_plot.set_autoscale(y=False)
 
         # setup drag 'n drop
         self.data_plot.dropEvent = self.dropEvent
@@ -238,6 +243,14 @@ class PlotWidget(QWidget):
         self.data_plot.autoscroll(checked)
         if checked:
             self.data_plot.redraw()
+
+    @Slot(bool)
+    def on_autoscale_checkbox_clicked(self, checked):
+        if checked:
+            self.data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
+            self.data_plot.redraw()
+        else:
+            self.data_plot.set_autoscale(y=False)
 
     @Slot()
     def on_clear_button_clicked(self):

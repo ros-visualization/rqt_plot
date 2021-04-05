@@ -91,6 +91,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QCheckBox" name="autoscale_checkbox">
+       <property name="text">
+        <string>autoscale</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QCheckBox" name="autoscroll_checkbox">
        <property name="text">
         <string>autoscroll</string>
