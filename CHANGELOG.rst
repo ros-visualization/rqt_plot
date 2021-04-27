@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.10 (2021-04-27)
+-------------------
 * Changed the build type to ament_python and fixed package to run with ros2 run (`#58 <https://github.com/ros-visualization/rqt_plot/issues/58>`_)
 * Contributors: Alejandro Hernández Cordero
 
