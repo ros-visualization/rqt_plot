@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Changed the build type to ament_python and fixed package to run with ros2 run (`#58 <https://github.com/ros-visualization/rqt_plot/issues/58>`_)
+* Contributors: Alejandro Hernández Cordero
+
 1.0.9 (2021-03-05)
 ------------------
 * Fix plots of array items (`#71 <https://github.com/ros-visualization/rqt_plot/issues/71>`_)
