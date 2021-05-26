@@ -120,6 +120,8 @@ class MatDataPlot(QWidget):
                 - https://github.com/ros-visualization/rqt_plot/issues/35
             """
             try:
+                if self.figure.get_figheight() == 0 or self.figure.get_figwidth() == 0:
+                    return
                 self.figure.tight_layout()
             except ValueError:
                 if parse_version(matplotlib.__version__) >= parse_version('2.2.3'):
