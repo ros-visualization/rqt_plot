@@ -38,8 +38,10 @@ import sys
 import threading
 import time
 
+from rclpy.qos import QoSDurabilityPolicy
 from rclpy.qos import QoSProfile
-from rosidl_runtime_py.utilities import get_message
+from rclpy.qos import QoSReliabilityPolicy
+from rqt_py_common.message_helpers import get_message_class
 from std_msgs.msg import Bool
 from python_qt_binding.QtCore import qWarning
 
@@ -101,11 +103,55 @@ class ROSData(object):
         topic_type, real_topic, fields = get_topic_type(node, topic)
         if topic_type is not None:
             self.field_evals = generate_field_evals(fields)
-            data_class = get_message(topic_type)
+            data_class = get_message_class(topic_type)
             self.sub = node.create_subscription(
-                data_class, real_topic, self._ros_cb, qos_profile=QoSProfile(depth=10))
+                data_class, real_topic, self._ros_cb, qos_profile=self.choose_qos(node, real_topic))
         else:
             self.error = RosPlotException("Can not resolve topic type of %s" % topic)
+
+    def choose_qos(self, node, topic_name):
+
+        qos_profile=QoSProfile(depth=10)
+        reliability_reliable_endpoints_count = 0
+        durability_transient_local_endpoints_count = 0
+        pubs_info = node.get_publishers_info_by_topic(topic_name)
+        publishers_count = len(pubs_info)
+
+        if publishers_count == 0:
+            return qos_profile
+
+        for info in pubs_info:
+            if (info.qos_profile.reliability == QoSReliabilityPolicy.RELIABLE):
+                reliability_reliable_endpoints_count += 1
+            if (info.qos_profile.durability == QoSDurabilityPolicy.TRANSIENT_LOCAL):
+                durability_transient_local_endpoints_count += 1
+
+        # If all endpoints are reliable, ask for reliable
+        if reliability_reliable_endpoints_count == publishers_count:
+            qos_profile.reliability = QoSReliabilityPolicy.RELIABLE
+        else:
+            if reliability_reliable_endpoints_count > 0:
+                print(
+                    'Some, but not all, publishers are offering '
+                    'QoSReliabilityPolicy.RELIABLE. Falling back to '
+                    'QoSReliabilityPolicy.BEST_EFFORT as it will connect '
+                    'to all publishers'
+                )
+            qos_profile.reliability = QoSReliabilityPolicy.BEST_EFFORT
+
+        # If all endpoints are transient_local, ask for transient_local
+        if durability_transient_local_endpoints_count == publishers_count:
+            qos_profile.durability = QoSDurabilityPolicy.TRANSIENT_LOCAL
+        else:
+            if durability_transient_local_endpoints_count > 0:
+                print(
+                    'Some, but not all, publishers are offering '
+                    'QoSDurabilityPolicy.TRANSIENT_LOCAL. Falling back to '
+                    'QoSDurabilityPolicy.VOLATILE as it will connect '
+                    'to all publishers'
+                )
+            qos_profile.durability = QoSDurabilityPolicy.VOLATILE
+        return qos_profile
 
     def close(self):
         self.node.destroy_subscription(self.sub)
