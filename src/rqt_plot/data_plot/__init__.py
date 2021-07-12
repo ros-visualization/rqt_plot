@@ -499,9 +499,10 @@ class DataPlot(QWidget):
                 # copy of the underlying data
                 region = curve['y'][start_index:end_index]
                 if len(region) > 0:
-                    y_limit[0] = min(y_limit[0], region.min())
-                    y_limit[1] = max(y_limit[1], region.max())
-
+                    if region.min():
+                        y_limit[0] = min(y_limit[0], region.min())
+                    if region.max():
+                        y_limit[1] = max(y_limit[1], region.max())
                 # TODO: compute padding around new min and max values
                 #       ONLY consider data for new values; not
                 #       existing limits, or we'll add padding on top of old
