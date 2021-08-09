@@ -103,7 +103,7 @@ class ROSData(object):
         topic_type, real_topic, fields = get_topic_type(node, topic)
         if topic_type is not None:
             self.field_evals = generate_field_evals(fields)
-            data_class = get_message_class(topic_type)
+            data_class = get_message(topic_type)
             self.sub = node.create_subscription(
                 data_class, real_topic, self._ros_cb, qos_profile=self.choose_qos(node, real_topic))
         else:
