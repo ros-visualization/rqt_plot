@@ -41,7 +41,7 @@ import time
 from rclpy.qos import QoSDurabilityPolicy
 from rclpy.qos import QoSProfile
 from rclpy.qos import QoSReliabilityPolicy
-from rqt_py_common.message_helpers import get_message_class
+from rosidl_runtime_py.utilities import get_message
 from std_msgs.msg import Bool
 from python_qt_binding.QtCore import qWarning
 
