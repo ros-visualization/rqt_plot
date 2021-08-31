@@ -2,6 +2,13 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.0 (2021-08-31)
+------------------
+* Automatically match QoS (`#76 <https://github.com/ros-visualization/rqt_plot/issues/76>`_)
+* Fix modern setuptools warning about dashes instead of underscores (`#74 <https://github.com/ros-visualization/rqt_plot/issues/74>`_)
+* Fix matplotlib exception on Windows (`#73 <https://github.com/ros-visualization/rqt_plot/issues/73>`_)
+* Contributors: Chris Lalancette, Gonzo
+
 1.0.10 (2021-04-27)
 -------------------
 * Changed the build type to ament_python and fixed package to run with ros2 run (`#58 <https://github.com/ros-visualization/rqt_plot/issues/58>`_)
