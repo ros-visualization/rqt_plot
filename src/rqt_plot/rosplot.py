@@ -121,7 +121,10 @@ class ROSData(object):
         try:
             self.lock.acquire()
             try:
-                self.buff_y.append(self._get_data(msg))
+                value = self._get_data(msg)
+                if value is None:
+                    return
+                self.buff_y.append(value)
                 # 944: use message header time if present
                 if msg.__class__._has_header:
                     self.buff_x.append(msg.header.stamp.to_sec() - self.start_time)
@@ -163,8 +166,8 @@ class ROSData(object):
                 val = f(val)
             return float(val)
         except IndexError:
-            self.error = RosPlotException(
-                "[%s] index error for: %s" % (self.name, str(val).replace('\n', ', ')))
+            rospy.logwarn_throttle_identical(1, "[{}] index error for: {}".format(
+                self.name, str(val).replace('\n', ', ')))
         except TypeError:
             self.error = RosPlotException("[%s] value was not numeric: %s" % (self.name, val))
 
