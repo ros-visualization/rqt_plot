@@ -39,8 +39,6 @@ from python_qt_binding.QtCore import QEvent, QSize, QPointF, Qt, Signal, Slot, q
 from python_qt_binding.QtGui import QColor, QPen, QBrush, QVector2D
 import qwt as Qwt
 
-from numpy import arange, zeros, concatenate
-
 
 # create real QwtDataPlot class
 class QwtDataPlot(Qwt.QwtPlot):
@@ -248,7 +246,7 @@ class QwtDataPlot(Qwt.QwtPlot):
 
 if __name__ == '__main__':
     from python_qt_binding.QtWidgets import QApplication
-    from numpy import sin
+    from numpy import arange, sin
 
     app = QApplication(sys.argv)
     plot = QwtDataPlot()
