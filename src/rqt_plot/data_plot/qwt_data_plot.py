@@ -137,6 +137,7 @@ class QwtDataPlot(Qwt.QwtPlot):
             del self._curves[curve_id]
 
     def set_values(self, curve_id, data_x, data_y):
+        curve_id = str(curve_id)
         curve = self._curves[curve_id]
         curve.setData(data_x, data_y)
 
