@@ -254,10 +254,10 @@ if __name__ == '__main__':
     plot = QwtDataPlot()
     plot.resize(700, 500)
     plot.show()
-    plot.add_curve('0', '(x/500)^2')
+    plot.add_curve('0', '(x/50)^2')
     plot.add_curve('1', 'sin(x / 20) * 500')
     x = arange(plot._num_value_saved)
-    plot.set_values('0', x, (x / 500.0) * (x / 5.0))
+    plot.set_values('0', x, (x / 50.0)**2)
     plot.set_values('1', x, sin(x / 20.0) * 500)
 
     sys.exit(app.exec_())
