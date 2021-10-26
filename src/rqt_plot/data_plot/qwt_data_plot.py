@@ -257,5 +257,7 @@ if __name__ == '__main__':
     x = arange(plot._num_value_saved)
     plot.set_values('0', x, (x / 50.0)**2)
     plot.set_values('1', x, sin(x / 20.0) * 500)
+    plot.set_xlim([x[0], x[-1]])
+    plot.set_ylim([-500, 500])
 
     sys.exit(app.exec_())
