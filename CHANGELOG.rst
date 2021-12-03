@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.14 (2021-12-03)
+-------------------
 * Fix Qwt plot engine (`#70 <https://github.com/ros-visualization/rqt_plot/issues/70>`_)
 * Contributors: Robert Haschke
 
