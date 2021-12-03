@@ -37,9 +37,7 @@ import sys
 
 from python_qt_binding.QtCore import QEvent, QSize, QPointF, Qt, Signal, Slot, qWarning
 from python_qt_binding.QtGui import QColor, QPen, QBrush, QVector2D
-import Qwt
-
-from numpy import arange, zeros, concatenate
+import qwt as Qwt
 
 
 # create real QwtDataPlot class
@@ -54,6 +52,10 @@ class QwtDataPlot(Qwt.QwtPlot):
         super(QwtDataPlot, self).__init__(*args)
         self.setCanvasBackground(Qt.white)
         self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.BottomLegend)
+        # attach a grid
+        grid = Qwt.QwtPlotGrid()
+        grid.attach(self)
+        grid.setPen(QPen(Qt.black, 0, Qt.DotLine))
 
         self._curves = {}
 
@@ -70,20 +72,13 @@ class QwtDataPlot(Qwt.QwtPlot):
         self._last_canvas_y = 0
         self._pressed_canvas_y = 0
         self._pressed_canvas_x = 0
-        self._last_click_coordinates = None
+        self._start_coordinates = None
 
         marker_axis_y = Qwt.QwtPlotMarker()
         marker_axis_y.setLabelAlignment(Qt.AlignRight | Qt.AlignTop)
         marker_axis_y.setLineStyle(Qwt.QwtPlotMarker.HLine)
         marker_axis_y.setYValue(0.0)
         marker_axis_y.attach(self)
-
-        self._picker = Qwt.QwtPlotPicker(
-            Qwt.QwtPlot.xBottom, Qwt.QwtPlot.yLeft, Qwt.QwtPicker.PolygonSelection,
-            Qwt.QwtPlotPicker.PolygonRubberBand, Qwt.QwtPicker.AlwaysOn, self.canvas()
-        )
-        self._picker.setRubberBandPen(QPen(Qt.blue))
-        self._picker.setTrackerPen(QPen(Qt.blue))
 
         # Initialize data
         self.rescale()
@@ -92,20 +87,21 @@ class QwtDataPlot(Qwt.QwtPlot):
         self.canvas().installEventFilter(self)
 
     def eventFilter(self, _, event):
-        if event.type() == QEvent.MouseButtonRelease:
+        if event.type() == QEvent.MouseButtonPress:
             x = self.invTransform(Qwt.QwtPlot.xBottom, event.pos().x())
             y = self.invTransform(Qwt.QwtPlot.yLeft, event.pos().y())
-            self._last_click_coordinates = QPointF(x, y)
+            self._start_coordinates = QPointF(x, y)
+        elif event.type() == QEvent.MouseButtonRelease:
+            self._start_coordinates = None
             self.limits_changed.emit()
         elif event.type() == QEvent.MouseMove:
             x = self.invTransform(Qwt.QwtPlot.xBottom, event.pos().x())
             y = self.invTransform(Qwt.QwtPlot.yLeft, event.pos().y())
             coords = QPointF(x, y)
-            if self._picker.isActive() and self._last_click_coordinates is not None:
-                toolTip = 'origin x: %.5f, y: %.5f' % (
-                    self._last_click_coordinates.x(), self._last_click_coordinates.y())
-                delta = coords - self._last_click_coordinates
-                toolTip += '\ndelta x: %.5f, y: %.5f\nlength: %.5f' % (
+            if self._start_coordinates is not None:
+                delta = coords - self._start_coordinates
+                toolTip = 'origin x: %.5f, y: %.5f\ndelta x: %.5f, y: %.5f\nlength: %.5f' % (
+                    self._start_coordinates.x(), self._start_coordinates.y(),
                     delta.x(), delta.y(), QVector2D(delta).length())
             else:
                 toolTip = 'buttons\nleft: measure\nmiddle: move\nright: zoom x/y\nwheel: zoom y'
@@ -141,6 +137,7 @@ class QwtDataPlot(Qwt.QwtPlot):
             del self._curves[curve_id]
 
     def set_values(self, curve_id, data_x, data_y):
+        curve_id = str(curve_id)
         curve = self._curves[curve_id]
         curve.setData(data_x, data_y)
 
@@ -249,16 +246,19 @@ class QwtDataPlot(Qwt.QwtPlot):
 
 
 if __name__ == '__main__':
-    from python_qt_binding.QtGui import QApplication
+    from python_qt_binding.QtWidgets import QApplication
+    from numpy import arange, sin
 
     app = QApplication(sys.argv)
     plot = QwtDataPlot()
     plot.resize(700, 500)
     plot.show()
-    plot.add_curve(0, '(x/500)^2')
+    plot.add_curve(0, '(x/50)^2')
     plot.add_curve(1, 'sin(x / 20) * 500')
-    for i in range(plot._num_value_saved):
-        plot.update_value(0, (i / 500.0) * (i / 5.0))
-        plot.update_value(1, math.sin(i / 20.0) * 500)
+    x = arange(plot._num_value_saved)
+    plot.set_values(0, x, (x / 50.0)**2)
+    plot.set_values(1, x, sin(x / 20.0) * 500)
+    plot.set_xlim([x[0], x[-1]])
+    plot.set_ylim([-500, 500])
 
     sys.exit(app.exec_())
