@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix Qwt plot engine (`#70 <https://github.com/ros-visualization/rqt_plot/issues/70>`_)
+* Contributors: Robert Haschke
+
 0.4.13 (2021-02-23)
 -------------------
 * Fix resize bug. Set minimum size of MatDataPlot's Canvas (`#69 <https://github.com/ros-visualization/rqt_plot/issues/69>`_)
