@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.1 (2022-01-14)
+------------------
+* Compare topics by whole tokens (`#49 <https://github.com/ros-visualization/rqt_plot/issues/49>`_)
+* Contributors: Mabel Zhang, Shane Loretz
+
 1.1.0 (2021-08-31)
 ------------------
 * Automatically match QoS (`#76 <https://github.com/ros-visualization/rqt_plot/issues/76>`_)
