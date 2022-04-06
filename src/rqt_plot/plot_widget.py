@@ -124,10 +124,10 @@ def get_plot_fields(node, topic_name):
             if not has_index:
                 return [], base_error_msg + f'{name} is a nested type but not index provided'
             if current_type.has_maximum_size():
-                if index >= current_type.maximum_size:
+                if index >= current_type.size:
                     return [], (
                         base_error_msg +
-                        f"index '{index}' out of bounds, maximum size is {current_type.maximum_size}")
+                        f"index '{index}' out of bounds, maximum size is {current_type.size}")
             current_type = current_type.value_type
         elif has_index:
             return [], base_error_msg + "{name} is not an array or sequence"
