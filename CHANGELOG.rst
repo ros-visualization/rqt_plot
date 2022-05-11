@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.2 (2022-05-10)
+------------------
+* Fix fixed-size Array visualization (`#81 <https://github.com/ros-visualization/rqt_plot/issues/81>`_)
+* Contributors: Michael Jeronimo
+
 1.1.1 (2022-01-14)
 ------------------
 * Compare topics by whole tokens (`#49 <https://github.com/ros-visualization/rqt_plot/issues/49>`_)
