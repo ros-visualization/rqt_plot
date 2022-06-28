@@ -1,0 +1,13 @@
+name: Mirror rolling to foxy-devel
+
+on:
+  push:
+    branches: [ rolling ]
+
+jobs:
+  mirror-to-foxy-devel:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: zofrex/mirror-branch@v1
+      with:
+        target-branch: foxy-devel
