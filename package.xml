@@ -2,10 +2,8 @@
   <name>rqt_plot</name>
   <version>1.2.0</version>
   <description>rqt_plot provides a GUI plugin visualizing numeric values in a 2D plot using different plotting backends.</description>
-  <maintainer email="mabel@openrobotics.org">Mabel Zhang</maintainer>
-  <maintainer email="logans@cottsay.net">Scott K Logan</maintainer>
-  <maintainer email="scholz@sim.tu-darmstadt.de">Dorian Scholz</maintainer>
-  <maintainer email="namniart@gmail.com">Austin Hendrix</maintainer>
+
+  <maintainer email="brandon@openrobotics.org">Brandon Ong</maintainer>
 
   <license>BSD</license>
 
@@ -13,8 +11,11 @@
   <url type="repository">https://github.com/ros-visualization/rqt_plot</url>
   <url type="bugtracker">https://github.com/ros-visualization/rqt_plot/issues</url>
 
-  <author>Dorian Scholz</author>
+  <author email="namniart@gmail.com">Austin Hendrix</author>
   <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
+  <author>Dorian Scholz</author>
+  <author email="mabel@openrobotics.org">Mabel Zhang</author>
+  <author email="logans@cottsay.net">Scott K Logan</author>
 
   <exec_depend version_gte="0.2.19">python_qt_binding</exec_depend>
   <exec_depend>python3-matplotlib</exec_depend>
