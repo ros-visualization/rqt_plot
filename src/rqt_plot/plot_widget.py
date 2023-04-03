@@ -114,7 +114,7 @@ def get_plot_fields(node, topic_name):
         no_field_error_msg = base_error_msg + f"'{name}' is not a field of '{topic_type_str}'"
 
         try:
-            current_type = current_message_class.get_field_and_field_types()[name]
+            current_type = current_message_class.get_fields_and_field_types()[name]
         except ValueError:
             return [], no_field_error_msg
         is_array_or_sequence = isinstance(current_type, AbstractNestedType)
