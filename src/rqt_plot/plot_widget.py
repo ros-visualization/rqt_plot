@@ -161,7 +161,7 @@ def get_plot_fields(node, topic_name):
         plottable_fields = []
         current_message_class = import_message_from_namespaced_type(current_type)
         for n_field, n_current_type in zip(
-            current_message_class.__slots__, current_message_class.SLOT_TYPES
+            current_message_class.get_fields_and_field_types().keys(), current_message_class.SLOT_TYPES
         ):
             if isinstance(n_current_type, BasicType):
                 plottable_fields.append(n_field[1:])
