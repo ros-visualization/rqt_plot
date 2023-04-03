@@ -114,9 +114,12 @@ def get_plot_fields(node, topic_name):
         no_field_error_msg = base_error_msg + f"'{name}' is not a field of '{topic_type_str}'"
 
         try:
-            current_type = current_message_class.get_fields_and_field_types()[name]
+            # This can only be done because the dict is order preserving and all the field name and values
+            # are stored in the same order.
+            field_name_index = list(current_message_class.get_fields_and_field_types().keys()).index(f'_{name}')
         except ValueError:
             return [], no_field_error_msg
+        current_type = current_message_class.SLOT_TYPES[field_name_index]
         is_array_or_sequence = isinstance(current_type, AbstractNestedType)
 
         if is_array_or_sequence:
