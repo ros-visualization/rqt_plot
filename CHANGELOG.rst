@@ -2,6 +2,9 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.2 (2023-04-11)
 ------------------
 * Changes the use of __slots_\_ for the field and field type getter (`#87 <https://github.com/ros-visualization/rqt_plot/issues/87>`_)
