@@ -116,7 +116,7 @@ def get_plot_fields(node, topic_name):
         try:
             # This can only be done because the dict is order preserving and all the field name and values
             # are stored in the same order.
-            field_name_index = list(current_message_class.get_fields_and_field_types().keys()).index(f'_{name}')
+            field_name_index = list(current_message_class.get_fields_and_field_types().keys()).index(f'{name}')
         except ValueError:
             return [], no_field_error_msg
         current_type = current_message_class.SLOT_TYPES[field_name_index]
