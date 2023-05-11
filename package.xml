@@ -1,6 +1,6 @@
 <package format="2">
   <name>rqt_plot</name>
-  <version>1.3.0</version>
+  <version>1.3.1</version>
   <description>rqt_plot provides a GUI plugin visualizing numeric values in a 2D plot using different plotting backends.</description>
 
   <maintainer email="brandon@openrobotics.org">Brandon Ong</maintainer>
