@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.3 (2023-05-11)
+------------------
 * Fix regression from #87 (`#91 <https://github.com/ros-visualization/rqt_plot/issues/91>`_)
 * Contributors: Yadunund
 
