@@ -32,6 +32,7 @@ setup(
         'using different plotting backends.'
     ),
     license='BSD',
+    tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'rqt_plot = ' + package_name + '.main:main',
