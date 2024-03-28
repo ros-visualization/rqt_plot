@@ -196,3 +196,9 @@ class MatDataPlot(QWidget):
 
     def get_ylim(self):
         return list(self._canvas.axes.get_ybound())
+
+    def save_settings(self, plugin_settings, instance_settings):
+        pass
+
+    def restore_settings(self, plugin_settings, instance_settings):
+        pass
