@@ -2,6 +2,12 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add in copyright tests to rqt_bag. (`#95 <https://github.com/ros-visualization/rqt_plot/issues/95>`_)
+* Add a test dependency on pytest. (`#94 <https://github.com/ros-visualization/rqt_plot/issues/94>`_)
+* Contributors: Chris Lalancette
+
 1.3.2 (2024-02-07)
 ------------------
 * Add in a pytest dependency for running tests. (`#92 <https://github.com/ros-visualization/rqt_plot/issues/92>`_)
