@@ -29,6 +29,7 @@
 import os
 import re
 import time
+from typing import Optional
 
 from ament_index_python.resources import get_resource
 from python_qt_binding import loadUi
@@ -179,7 +180,6 @@ def is_plottable(node, topic_name):
 
 
 class PlotWidget(QWidget):
-    _redraw_interval = 40
 
     def __init__(self, node, initial_topics=None, start_paused=False):
         super(PlotWidget, self).__init__()
@@ -193,13 +193,12 @@ class PlotWidget(QWidget):
         loadUi(ui_file, self)
         self.subscribe_topic_button.setIcon(QIcon.fromTheme('list-add'))
         self.remove_topic_button.setIcon(QIcon.fromTheme('list-remove'))
-        self.pause_button.setIcon(QIcon.fromTheme('media-playback-pause'))
+        self.play_pause_button.setIcon(QIcon.fromTheme('media-playback-pause'))
         self.clear_button.setIcon(QIcon.fromTheme('edit-clear'))
         self.data_plot = None
 
         self.subscribe_topic_button.setEnabled(False)
-        if start_paused:
-            self.pause_button.setChecked(True)
+        self._paused = start_paused
 
         self._topic_completer = TopicCompleter(self.topic_edit)
         self._topic_completer.update_topics(node)
@@ -212,9 +211,11 @@ class PlotWidget(QWidget):
         # init and start update timer for plot
         self._update_plot_timer = QTimer(self)
         self._update_plot_timer.timeout.connect(self.update_plot)
+        if not self._paused:
+            self._set_play()
 
     def switch_data_plot_widget(self, data_plot):
-        self.enable_timer(enabled=False)
+        self._set_pause()
 
         self.data_plot_layout.removeWidget(self.data_plot)
         if self.data_plot is not None:
@@ -293,8 +294,11 @@ class PlotWidget(QWidget):
         self.add_topic(str(self.topic_edit.text()))
 
     @Slot(bool)
-    def on_pause_button_clicked(self, checked):
-        self.enable_timer(not checked)
+    def on_play_pause_button_clicked(self, checked):
+        if self._paused:
+            self._set_play()
+        else:
+            self._set_pause()
 
     @Slot(bool)
     def on_autoscroll_checkbox_clicked(self, checked):
@@ -305,6 +309,13 @@ class PlotWidget(QWidget):
     @Slot()
     def on_clear_button_clicked(self):
         self.clear_plot()
+
+    @Slot(float)
+    def on_refresh_rate_spinbox_valueChanged(self, val):
+        if not self._paused:
+            # If we are playing, then pause and re-play with the new interval
+            self._set_pause()
+            self._set_play(val)
 
     def update_plot(self):
         if self.data_plot is not None:
@@ -322,9 +333,13 @@ class PlotWidget(QWidget):
 
     def _subscribed_topics_changed(self):
         self._update_remove_topic_menu()
-        if not self.pause_button.isChecked():
+
+        if self._paused and self._rosdata:
             # if pause button is not pressed, enable timer based on subscribed topics
-            self.enable_timer(self._rosdata)
+            self._set_play()
+        elif not self._paused and not self._rosdata:
+            self._set_pause()
+
         self.data_plot.redraw()
 
     def _update_remove_topic_menu(self):
@@ -382,8 +397,21 @@ class PlotWidget(QWidget):
 
         self._subscribed_topics_changed()
 
-    def enable_timer(self, enabled=True):
-        if enabled:
-            self._update_plot_timer.start(self._redraw_interval)
-        else:
-            self._update_plot_timer.stop()
+    def _set_pause(self):
+        # pause subscriptions
+        self._paused = True
+        # Stop timer
+        self._update_plot_timer.stop()
+        # Set button to 'play'
+        self.play_pause_button.setIcon(QIcon.fromTheme("media-playback-start"))
+
+    def _set_play(self, refresh_rate: Optional[float] = None):
+        if refresh_rate is None:
+            refresh_rate = self.refresh_rate_spinbox.value()
+        # play subscriptions
+        self._paused = False
+        # Set button to 'pause'
+        self.play_pause_button.setIcon(QIcon.fromTheme("media-playback-pause"))
+        # Start timer again. Input is in milliseconds as int.
+        period_in_ms = 1000.0 / refresh_rate
+        self._update_plot_timer.start(period_in_ms)

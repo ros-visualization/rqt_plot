@@ -144,11 +144,19 @@ class Plot(Plugin):
         self._data_plot.save_settings(plugin_settings, instance_settings)
         instance_settings.set_value('autoscroll', self._widget.autoscroll_checkbox.isChecked())
         instance_settings.set_value('topics', pack(self._widget._rosdata.keys()))
+        instance_settings.set_value("refresh_rate", self._widget.refresh_rate_spinbox.value())
 
     def restore_settings(self, plugin_settings, instance_settings):
         autoscroll = instance_settings.value('autoscroll', True) in [True, 'true']
         self._widget.autoscroll_checkbox.setChecked(autoscroll)
         self._data_plot.autoscroll(autoscroll)
+
+        refresh_rate = instance_settings.value("refresh_rate")
+        if refresh_rate is not None:
+            try:
+                self._widget.refresh_rate_spinbox.setValue(float(refresh_rate))
+            except ValueError:
+                pass
 
         self._update_title()
 
@@ -159,6 +167,7 @@ class Plot(Plugin):
                     self._widget.add_topic(topic)
 
         self._data_plot.restore_settings(plugin_settings, instance_settings)
+
 
     def trigger_configuration(self):
         self._data_plot.doSettingsDialog()
