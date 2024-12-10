@@ -44,15 +44,16 @@ from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import BOOLEAN_TYPE
 from rosidl_parser.definition import NamespacedType
 
+from rosidl_runtime_py import import_message_from_namespaced_type
 from rosidl_runtime_py.utilities import get_message
 from rosidl_runtime_py.utilities import get_message_namespaced_type
-from rosidl_runtime_py import import_message_from_namespaced_type
-
-from rqt_py_common.topic_completer import TopicCompleter
 
 from rqt_plot.rosplot import ROSData, RosPlotException
 
+from rqt_py_common.topic_completer import TopicCompleter
+
 ARRAY_TYPE_REGEX = re.compile(r'(.+)\[(.*)\]')
+
 
 def _parse_field_name_and_index(field_name):
     # Field names may be indexed, e.g. `my_field[2]`.
@@ -78,11 +79,11 @@ def get_plot_fields(node, topic_name):
             topic_type_str = topic_types[0] if topic_types else None
             break
     if real_topic is None:
-        message = "topic %s does not exist" % (topic_name)
+        message = 'topic %s does not exist' % (topic_name)
         return [], message
 
     if topic_type_str is None:
-        message = "no topic types found for topic %s " % (topic_name)
+        message = 'no topic types found for topic %s ' % (topic_name)
         return [], message
 
     if len(topic_name) < len(real_topic) + 1:
@@ -106,13 +107,14 @@ def get_plot_fields(node, topic_name):
         parsed_fields.append(next_field)
         name, index = _parse_field_name_and_index(next_field)
         has_index = index is not None
-        base_error_msg = f"trying to parse field '{'.'.join(parsed_fields)}' of topic {real_topic}: "
-        no_field_error_msg = base_error_msg + f"'{name}' is not a field of '{topic_type_str}'"
+        base_err_msg = f"trying to parse field '{'.'.join(parsed_fields)}' of topic {real_topic}: "
+        no_field_error_msg = base_err_msg + f"'{name}' is not a field of '{topic_type_str}'"
 
         try:
-            # This can only be done because the dict is order preserving and all the field name and values
-            # are stored in the same order.
-            field_name_index = list(current_message_class.get_fields_and_field_types().keys()).index(f'{name}')
+            # This can only be done because the dict is order preserving and all the field name
+            # and values are stored in the same order.
+            msg_field_keys = current_message_class.get_fields_and_field_types().keys()
+            field_name_index = list(msg_field_keys).index(f'{name}')
         except ValueError:
             return [], no_field_error_msg
         current_type = current_message_class.SLOT_TYPES[field_name_index]
@@ -120,19 +122,23 @@ def get_plot_fields(node, topic_name):
 
         if is_array_or_sequence:
             if not has_index:
-                return [], base_error_msg + f'{name} is a nested type but no index provided'
+                return [], base_err_msg + f'{name} is a nested type but no index provided'
 
             if current_type.has_maximum_size():
-                # has_maximum_size() doesn't necessarily mean that the object has a 'maximum_size' field. The meaning
-                # appears to be that the object is bounded in its size and has either a 'maximum_size' or 'size' field.
-                size = current_type.maximum_size if hasattr(current_type, 'maximum_size') else current_type.size
+                # has_maximum_size() doesn't necessarily mean that the object has a 'maximum_size'
+                # field. The meaning appears to be that the object is bounded in its size and has
+                # either a 'maximum_size' or 'size' field.
+                if hasattr(current_type, 'maximum_size'):
+                    size = current_type.maximum_size
+                else:
+                    size = current_type.size
                 if index >= size:
                     return [], (
-                        base_error_msg +
+                        base_err_msg +
                         f"index '{index}' out of bounds, maximum size is {size}")
             current_type = current_type.value_type
         elif has_index:
-            return [], base_error_msg + "{name} is not an array or sequence"
+            return [], base_err_msg + '{name} is not an array or sequence'
 
         if not isinstance(current_type, NamespacedType):
             break
@@ -141,7 +147,8 @@ def get_plot_fields(node, topic_name):
 
     try:
         next_field = next(nested_fields)
-        return [], f"'{'.'.join(parsed_fields)}' is a primitive type with no field named '{next_field}'"
+        msg = f"'{'.'.join(parsed_fields)}' is a primitive type with no field named '{next_field}'"
+        return [], msg
     except StopIteration:
         pass
 
@@ -151,14 +158,13 @@ def get_plot_fields(node, topic_name):
         return [], f"'{topic_name}' is a sequence, which cannot be plotted"
     if isinstance(current_type, Array):
         return (
-            [f'{topic_name}[{i}]' for i in range(field_class.maximum_size)],
+            [f'{topic_name}[{i}]' for i in range(current_type.maximum_size)],
             f"'{topic_name}' is a fixed size array")
     if isinstance(current_type, NamespacedType):
         plottable_fields = []
         current_message_class = import_message_from_namespaced_type(current_type)
-        for n_field, n_current_type in zip(
-            current_message_class.get_fields_and_field_types().keys(), current_message_class.SLOT_TYPES
-        ):
+        current_msg_keys = current_message_class.get_fields_and_field_types().keys()
+        for n_field, n_current_type in zip(current_msg_keys, current_message_class.SLOT_TYPES):
             if isinstance(n_current_type, BasicType):
                 plottable_fields.append(n_field[1:])
         if plottable_fields:
@@ -167,7 +173,7 @@ def get_plot_fields(node, topic_name):
                 f"{len(plottable_fields)} plottable fields in '{topic_name}'"
             )
     if not isinstance(current_type, BasicType):
-        return [], f"{topic_name} cannot be plotted"
+        return [], f'{topic_name} cannot be plotted'
 
     data_kind = 'boolean' if current_type.typename == BOOLEAN_TYPE else 'numeric'
     return [topic_name], f"topic '{topic_name}' is {data_kind}"
@@ -234,7 +240,7 @@ class PlotWidget(QWidget):
             self._initial_topics = None
         else:
             for topic_name, rosdata in self._rosdata.items():
-                data_x, data_y = rosdata.next()
+                data_x, data_y = rosdata.next_data()
                 self.data_plot.add_curve(topic_name, topic_name, data_x, data_y)
 
         self._subscribed_topics_changed()
@@ -251,7 +257,7 @@ class PlotWidget(QWidget):
                 return
             item = event.source().selectedItems()[0]
             topic_name = item.data(0, Qt.UserRole)
-            if topic_name == None:
+            if topic_name is None:
                 qWarning('Plot.dragEnterEvent(): not hasattr(item, ros_topic_name_)')
                 return
         else:
@@ -311,7 +317,7 @@ class PlotWidget(QWidget):
             needs_redraw = False
             for topic_name, rosdata in self._rosdata.items():
                 try:
-                    data_x, data_y = rosdata.next()
+                    data_x, data_y = rosdata.next_data()
                     if data_x or data_y:
                         self.data_plot.update_values(topic_name, data_x, data_y)
                         needs_redraw = True
@@ -355,7 +361,7 @@ class PlotWidget(QWidget):
                 qWarning(str(self._rosdata[topic_name].error))
                 del self._rosdata[topic_name]
             else:
-                data_x, data_y = self._rosdata[topic_name].next()
+                data_x, data_y = self._rosdata[topic_name].next_data()
                 self.data_plot.add_curve(topic_name, topic_name, data_x, data_y)
                 topics_changed = True
 

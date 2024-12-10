@@ -26,33 +26,31 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from python_qt_binding.QtCore import Slot, Qt, qVersion, qWarning, Signal
+from pyqtgraph import mkBrush, mkPen, PlotWidget
+
+from python_qt_binding.QtCore import Qt, Signal
 from python_qt_binding.QtGui import QColor
 from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
 
-if qVersion().startswith('5.'):
-    try:
-        from pkg_resources import parse_version
-    except:
-        import re
+try:
+    from pkg_resources import parse_version
+except ImportError:
+    import re
 
-        def parse_version(s):
-            return [int(x) for x in re.sub(r'(\.0+)*$', '', s).split('.')]
+    def parse_version(s):
+        return [int(x) for x in re.sub(r'(\.0+)*$', '', s).split('.')]
 
-    try:
-        from pyqtgraph import __version__ as pyqtgraph_version
-    except RuntimeError:
-        # pyqtgraph < 1.0 using Qt4 failing on 16.04 because kinetic uses Qt5.
-        # This raises RuntimeError('the PyQt4.QtCore and PyQt5.QtCore modules both
-        # wrap the QObject class')
-        import pkg_resources
-        pyqtgraph_version = pkg_resources.get_distribution("pyqtgraph").version
+try:
+    from pyqtgraph import __version__ as pyqtgraph_version
+except RuntimeError:
+    # pyqtgraph < 1.0 using Qt4 failing on 16.04 because kinetic uses Qt5.
+    # This raises RuntimeError('the PyQt4.QtCore and PyQt5.QtCore modules both
+    # wrap the QObject class')
+    import pkg_resources
+    pyqtgraph_version = pkg_resources.get_distribution('pyqtgraph').version
 
-    if parse_version(pyqtgraph_version) < parse_version('0.10.0'):
-        raise ImportError('A newer PyQtGraph version is required (at least 0.10 for Qt 5)')
-
-from pyqtgraph import PlotWidget, mkPen, mkBrush
-import numpy
+if parse_version(pyqtgraph_version) < parse_version('0.10.0'):
+    raise ImportError('A newer PyQtGraph version is required (at least 0.10 for Qt 5)')
 
 
 class PyQtGraphDataPlot(QWidget):
@@ -75,13 +73,14 @@ class PyQtGraphDataPlot(QWidget):
 
     def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
         pen = mkPen(curve_color, width=1)
-        symbol = "o"
+        symbol = 'o'
         symbolPen = mkPen(QColor(Qt.black))
         symbolBrush = mkBrush(curve_color)
         # this adds the item to the plot and legend
         if markers_on:
-            plot = self._plot_widget.plot(name=curve_name, pen=pen, symbol=symbol,
-                                          symbolPen=symbolPen, symbolBrush=symbolBrush, symbolSize=4)
+            plot = self._plot_widget.plot(
+                name=curve_name, pen=pen, symbol=symbol,
+                symbolPen=symbolPen, symbolBrush=symbolBrush, symbolSize=4)
         else:
             plot = self._plot_widget.plot(name=curve_name, pen=pen)
         self._curves[curve_id] = plot
