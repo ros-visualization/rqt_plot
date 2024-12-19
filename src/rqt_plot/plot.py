@@ -28,15 +28,12 @@
 
 import argparse
 
-from python_qt_binding import QT_BINDING
-from python_qt_binding.QtCore import qDebug
 from rqt_gui_py.plugin import Plugin
 
 from rqt_py_common.ini_helper import pack, unpack
 
-from .plot_widget import PlotWidget
-
 from .data_plot import DataPlot
+from .plot_widget import PlotWidget
 
 
 class Plot(Plugin):
@@ -109,12 +106,12 @@ class Plot(Plugin):
                     # the first prefix includes a field name, so save then strip it off
                     c_topics.append(base)
                     if '/' not in base:
-                        parser.error("%s must contain a topic and field name" % sub_t)
+                        parser.error('%s must contain a topic and field name' % sub_t)
                     base = base[:base.rfind('/')]
 
                     # compute the rest of the field names
                     fields = sub_t.split(':')[1:]
-                    c_topics.extend(["%s/%s" % (base, f) for f in fields if f])
+                    c_topics.extend(['%s/%s' % (base, f) for f in fields if f])
                 else:
                     c_topics.append(sub_t)
 

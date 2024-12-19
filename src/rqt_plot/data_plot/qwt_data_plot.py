@@ -27,15 +27,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # -*- coding: utf-8 -*-
-from __future__ import division
 import math
 import sys
 
-from python_qt_binding.QtCore import QEvent, QSize, QPointF, Qt, Signal, Slot, qWarning
-from python_qt_binding.QtGui import QColor, QPen, QBrush, QVector2D
+from python_qt_binding.QtCore import QEvent, QPointF, QSize, Qt, qWarning, Signal
+from python_qt_binding.QtGui import QBrush, QColor, QPen, QVector2D
 import Qwt
-
-from numpy import arange, zeros, concatenate
 
 
 # create real QwtDataPlot class
@@ -126,7 +123,8 @@ class QwtDataPlot(Qwt.QwtPlot):
         curve_object.setPen(curve_color)
         if markers_on:
             curve_object.setSymbol(
-                Qwt.QwtSymbol(Qwt.QwtSymbol.Ellipse, QBrush(curve_color), QPen(Qt.black), QSize(4, 4)))
+                Qwt.QwtSymbol(
+                    Qwt.QwtSymbol.Ellipse, QBrush(curve_color), QPen(Qt.black), QSize(4, 4)))
         self._curves[curve_id] = curve_object
 
     def remove_curve(self, curve_id):
@@ -159,18 +157,14 @@ class QwtDataPlot(Qwt.QwtPlot):
         self.redraw()
 
     def rescale_axis_x(self, delta__x):
-        """
-        add delta_x to the length of the x axis
-        """
+        """Add delta_x to the length of the x axis."""
         x_width = self._x_limits[1] - self._x_limits[0]
         x_width += delta__x
         self._x_limits[1] = x_width + self._x_limits[0]
         self.rescale()
 
     def scale_axis_y(self, max_value):
-        """
-        set the y axis height to max_value, about the current center
-        """
+        """Set the y axis height to max_value, about the current center."""
         canvas_display_height = max_value
         canvas_offset_y = (self._y_limits[1] + self._y_limits[0]) / 2.0
         y_lower_limit = canvas_offset_y - (canvas_display_height / 2)
@@ -179,13 +173,11 @@ class QwtDataPlot(Qwt.QwtPlot):
         self.rescale()
 
     def move_canvas(self, delta_x, delta_y):
-        """
-        move the canvas by delta_x and delta_y in SCREEN COORDINATES
-        """
+        """Move the canvas by delta_x and delta_y in SCREEN COORDINATES."""
         canvas_offset_x = delta_x * self._canvas_display_width / self.canvas().width()
         canvas_offset_y = delta_y * self._canvas_display_height / self.canvas().height()
-        self._x_limits = [l + canvas_offset_x for l in self._x_limits]
-        self._y_limits = [l + canvas_offset_y for l in self._y_limits]
+        self._x_limits = [limit + canvas_offset_x for limit in self._x_limits]
+        self._y_limits = [limit + canvas_offset_y for limit in self._y_limits]
         self.rescale()
 
     def mousePressEvent(self, event):
@@ -205,7 +197,8 @@ class QwtDataPlot(Qwt.QwtPlot):
             delta_y = (self.canvas().height() / 2.0) - self._pressed_canvas_y
             self.move_canvas(0, zoom_factor * delta_y * 1.0225)
             self.scale_axis_y(
-                max(0.005, self._canvas_display_height - (zoom_factor * self._canvas_display_height)))
+                max(0.005,
+                    self._canvas_display_height - (zoom_factor * self._canvas_display_height)))
             self.rescale_axis_x(self._last_canvas_x - canvas_x)
         self._last_canvas_x = canvas_x
         self._last_canvas_y = canvas_y
@@ -227,7 +220,7 @@ class QwtDataPlot(Qwt.QwtPlot):
         self.limits_changed.emit()
 
     def vline(self, x, color):
-        qWarning("QwtDataPlot.vline is not implemented yet")
+        qWarning('QwtDataPlot.vline is not implemented yet')
 
     def set_xlim(self, limits):
         self.setAxisScale(Qwt.QwtPlot.xBottom, limits[0], limits[1])

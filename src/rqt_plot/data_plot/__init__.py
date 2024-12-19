@@ -29,26 +29,26 @@
 
 import numpy
 
-from qt_gui_py_common.simple_settings_dialog import SimpleSettingsDialog
 from python_qt_binding import QT_BINDING
-from python_qt_binding.QtCore import Qt, qVersion, qWarning, Signal
+from python_qt_binding.QtCore import Qt, qWarning, Signal
 from python_qt_binding.QtGui import QColor
-from python_qt_binding.QtWidgets import QWidget, QHBoxLayout
+from python_qt_binding.QtWidgets import QHBoxLayout, QWidget
+from qt_gui_py_common.simple_settings_dialog import SimpleSettingsDialog
 from rqt_py_common.ini_helper import pack, unpack
 
 try:
     from .pyqtgraph_data_plot import PyQtGraphDataPlot
-except ImportError as e:
+except ImportError:
     PyQtGraphDataPlot = None
 
 try:
     from .mat_data_plot import MatDataPlot
-except ImportError as e:
+except ImportError:
     MatDataPlot = None
 
 try:
     from .qwt_data_plot import QwtDataPlot
-except ImportError as e:
+except ImportError:
     QwtDataPlot = None
 
 # separate class for DataPlot exceptions, just so that users can differentiate
@@ -61,8 +61,8 @@ class DataPlotException(Exception):
 
 
 class DataPlot(QWidget):
-
-    """A widget for displaying a plot of data
+    """
+    A widget for displaying a plot of data.
 
     The DataPlot widget displays a plot, on one of several plotting backends,
     depending on which backend(s) are available at runtime. It currently
@@ -75,6 +75,7 @@ class DataPlot(QWidget):
     Currently, the user MUST call `restore_settings` before using the widget,
     to cause the creation of the enclosed plotting widget.
     """
+
     # plot types in order of priority
     plot_types = [
         {
@@ -119,10 +120,11 @@ class DataPlot(QWidget):
     _add_curve = Signal(str, str, 'QColor', bool)
 
     def __init__(self, parent=None):
-        """Create a new, empty DataPlot
+        """
+        Create a new, empty DataPlot.
 
         This will raise a RuntimeError if none of the supported plotting
-        backends can be found
+        backends can be found.
         """
         super(DataPlot, self).__init__(parent)
         self._plot_index = 0
@@ -144,14 +146,10 @@ class DataPlot(QWidget):
 
         enabled_plot_types = [pt for pt in self.plot_types if pt['enabled']]
         if not enabled_plot_types:
-            if qVersion().startswith('4.'):
-                version_info = '1.1.0'
-            else:
-                # minimum matplotlib version for Qt 5
-                version_info = '1.4.0'
+            # minimum matplotlib version for Qt 5
+            version_info = '1.4.0'
             if QT_BINDING == 'pyside':
-                version_info += ' and PySide %s' % \
-                    ('> 1.1.0' if qVersion().startswith('4.') else '>= 2.0.0')
+                version_info += ' and PySide 2.0.0'
             raise RuntimeError(
                 'No usable plot type found. Install at least one of: PyQtGraph, MatPlotLib '
                 '(at least %s) or Python-Qwt5.' % version_info)
@@ -161,7 +159,7 @@ class DataPlot(QWidget):
         self.show()
 
     def _switch_data_plot_widget(self, plot_index, markers_on=False):
-        """Internal method for activating a plotting backend by index"""
+        """Activate a plotting backend by index (internal method)."""
         # check if selected plot type is available
         if not self.plot_types[plot_index]['enabled']:
             # find other available plot type
@@ -216,14 +214,16 @@ class DataPlot(QWidget):
     # interface out to the managing GUI component: get title, save, restore,
     # etc
     def getTitle(self):
-        """get the title of the current plotting backend"""
+        """Get the title of the current plotting backend."""
         return self.plot_types[self._plot_index]['title']
 
     def save_settings(self, plugin_settings, instance_settings):
-        """Save the settings associated with this widget
+        """
+        Save the settings associated with this widget.
 
         Currently, this is just the plot type, but may include more useful
-        data in the future"""
+        data in the future
+        """
         instance_settings.set_value('plot_type', self._plot_index)
         xlim = self.get_xlim()
         ylim = self.get_ylim()
@@ -235,9 +235,11 @@ class DataPlot(QWidget):
         instance_settings.set_value('y_limits', pack(ylim))
 
     def restore_settings(self, plugin_settings, instance_settings):
-        """Restore the settings for this widget
+        """
+        Restore the settings for this widget.
 
-        Currently, this just restores the plot type."""
+        Currently, this just restores the plot type.
+        """
         self._switch_data_plot_widget(int(instance_settings.value('plot_type', 0)))
         xlim = unpack(instance_settings.value('x_limits', []))
         ylim = unpack(instance_settings.value('y_limits', []))
@@ -247,23 +249,24 @@ class DataPlot(QWidget):
             try:
                 xlim = [float(x) for x in xlim]
                 self.set_xlim(xlim)
-            except:
-                qWarning("Failed to restore X limits")
+            except Exception:
+                qWarning('Failed to restore X limits')
         if ylim:
             try:
                 ylim = [float(y) for y in ylim]
                 self.set_ylim(ylim)
-            except:
-                qWarning("Failed to restore Y limits")
+            except Exception:
+                qWarning('Failed to restore Y limits')
 
     def doSettingsDialog(self):
-        """Present the user with a dialog for choosing the plot backend
+        """
+        Present the user with a dialog for choosing the plot backend.
 
         This displays a SimpleSettingsDialog asking the user to choose a
         plot type, gets the result, and updates the plot type as necessary
 
-        This method is blocking"""
-
+        This method is blocking
+        """
         marker_settings = [
             {
                 'title': 'Show Plot Markers',
@@ -289,23 +292,26 @@ class DataPlot(QWidget):
             self._switch_data_plot_widget(
                 plot_type['selected_index'], 0 in checkboxes['selected_indexes'])
         else:
-            if checkboxes is not None and self._markers_on != (0 in checkboxes['selected_indexes']):
+            if checkboxes is not None and \
+               self._markers_on != (0 in checkboxes['selected_indexes']):
                 self._switch_plot_markers(0 in checkboxes['selected_indexes'])
 
     # interface out to the managing DATA component: load data, update data,
     # etc
     def autoscroll(self, enabled=True):
-        """Enable or disable autoscrolling of the plot"""
+        """Enable or disable autoscrolling of the plot."""
         self._autoscroll = enabled
 
     def redraw(self):
         self._redraw.emit()
 
     def _do_redraw(self):
-        """Redraw the underlying plot
+        """
+        Redraw the underlying plot.
 
         This causes the underlying plot to be redrawn. This is usually used
-        after adding or updating the plot data"""
+        after adding or updating the plot data
+        """
         if self._data_plot_widget:
             self._merged_autoscale()
             for curve_id in self._curves:
@@ -321,11 +327,12 @@ class DataPlot(QWidget):
         if curve_id in self._curves:
             return self._curves[curve_id]
         else:
-            raise DataPlotException("No curve named %s in this DataPlot" %
+            raise DataPlotException('No curve named %s in this DataPlot' %
                                     (curve_id))
 
     def add_curve(self, curve_id, curve_name, data_x, data_y):
-        """Add a new, named curve to this plot
+        """
+        Add a new, named curve to this plot.
 
         Add a curve named `curve_name` to the plot, with initial data series
         `data_x` and `data_y`.
@@ -346,7 +353,7 @@ class DataPlot(QWidget):
             self._add_curve.emit(curve_id, curve_name, curve_color, self._markers_on)
 
     def remove_curve(self, curve_id):
-        """Remove the specified curve from this plot"""
+        """Remove the specified curve from this plot."""
         # TODO: do on UI thread with signals
         if curve_id in self._curves:
             del self._curves[curve_id]
@@ -354,7 +361,8 @@ class DataPlot(QWidget):
             self._data_plot_widget.remove_curve(curve_id)
 
     def update_values(self, curve_id, values_x, values_y, sort_data=True):
-        """Append new data to an existing curve
+        """
+        Append new data to an existing curve.
 
         `values_x` and `values_y` will be appended to the existing data for
         `curve_id`
@@ -376,7 +384,8 @@ class DataPlot(QWidget):
             curve['y'] = curve['y'][sort_order]
 
     def clear_values(self, curve_id=None):
-        """Clear the values for the specified curve, or all curves
+        """
+        Clear the values for the specified curve, or all curves.
 
         This will erase the data series associaed with `curve_id`, or all
         curves if `curve_id` is not present or is None
@@ -395,7 +404,8 @@ class DataPlot(QWidget):
                 self._curves[curve_id]['y'] = numpy.array([])
 
     def vline(self, x, color=RED):
-        """Draw a vertical line on the plot
+        """
+        Draw a vertical line on the plot.
 
         Draw a line a position X, with the given color
 
@@ -409,10 +419,11 @@ class DataPlot(QWidget):
 
     # autoscaling methods
     def set_autoscale(self, x=None, y=None):
-        """Change autoscaling of plot axes
+        """
+        Change autoscaling of plot axes.
 
-        if a parameter is not passed, the autoscaling setting for that axis is
-        not changed
+        If a parameter is not passed, the autoscaling setting for that axis is
+        not changed.
 
         @param x: enable or disable autoscaling for X
         @param y: set autoscaling mode for Y
@@ -523,30 +534,30 @@ class DataPlot(QWidget):
         self.set_ylim(y_limit)
 
     def get_xlim(self):
-        """get X limits"""
+        """Get X limits."""
         if self._data_plot_widget:
             return self._data_plot_widget.get_xlim()
         else:
-            qWarning("No plot widget; returning default X limits")
+            qWarning('No plot widget; returning default X limits')
             return [0.0, 1.0]
 
     def set_xlim(self, limits):
-        """set X limits"""
+        """Set X limits."""
         if self._data_plot_widget:
             self._data_plot_widget.set_xlim(limits)
         else:
             qWarning("No plot widget; can't set X limits")
 
     def get_ylim(self):
-        """get Y limits"""
+        """Get Y limits."""
         if self._data_plot_widget:
             return self._data_plot_widget.get_ylim()
         else:
-            qWarning("No plot widget; returning default Y limits")
+            qWarning('No plot widget; returning default Y limits')
             return [0.0, 10.0]
 
     def set_ylim(self, limits):
-        """set Y limits"""
+        """Set Y limits."""
         if self._data_plot_widget:
             self._data_plot_widget.set_ylim(limits)
         else:
