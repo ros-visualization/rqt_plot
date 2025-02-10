@@ -166,7 +166,7 @@ def get_plot_fields(node, topic_name):
         current_msg_keys = current_message_class.get_fields_and_field_types().keys()
         for n_field, n_current_type in zip(current_msg_keys, current_message_class.SLOT_TYPES):
             if isinstance(n_current_type, BasicType):
-                plottable_fields.append(n_field[1:])
+                plottable_fields.append(n_field)
         if plottable_fields:
             return (
                 [f'{topic_name}/{field}' for field in plottable_fields],
