@@ -125,7 +125,7 @@ def get_plot_fields(node, topic_name):
 
         if is_array_or_sequence:
             if not has_index:
-                return [], base_error_msg + f'{name} is a nested type but no index provided'
+                return [], base_err_msg + f"'{name}' is a nested type but no index provided"
 
             if current_type.has_maximum_size():
                 # has_maximum_size() doesn't necessarily mean that the object has a 'maximum_size' field. The meaning
@@ -133,11 +133,11 @@ def get_plot_fields(node, topic_name):
                 size = current_type.maximum_size if hasattr(current_type, 'maximum_size') else current_type.size
                 if index >= size:
                     return [], (
-                        base_error_msg +
+                        base_err_msg +
                         f"index '{index}' out of bounds, maximum size is {size}")
             current_type = current_type.value_type
         elif has_index:
-            return [], base_error_msg + "{name} is not an array or sequence"
+            return [], base_err_msg + f"'{name}' is not an array or sequence"
 
         if not isinstance(current_type, NamespacedType):
             break
