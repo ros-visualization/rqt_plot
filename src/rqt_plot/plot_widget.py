@@ -82,15 +82,15 @@ def get_plot_fields(node, topic_name):
             topic_type_str = topic_types[0] if topic_types else None
             break
     if real_topic is None:
-        message = "topic %s does not exist" % (topic_name)
+        message = "topic '%s' does not exist" % (topic_name)
         return [], message
 
     if topic_type_str is None:
-        message = "no topic types found for topic %s " % (topic_name)
+        message = "no topic types found for topic '%s'" % (topic_name)
         return [], message
 
     if len(topic_name) < len(real_topic) + 1:
-        message = 'no field specified in topic name "{}"'.format(topic_name)
+        message = "no field specified in topic name '{}'".format(topic_name)
         return [], message
 
     nested_field_path = topic_name[len(real_topic) + 1:]
@@ -110,8 +110,11 @@ def get_plot_fields(node, topic_name):
         parsed_fields.append(next_field)
         name, index = _parse_field_name_and_index(next_field)
         has_index = index is not None
-        base_error_msg = f"trying to parse field '{'.'.join(parsed_fields)}' of topic {real_topic}: "
-        no_field_error_msg = base_error_msg + f"'{name}' is not a field of '{topic_type_str}'"
+        base_err_msg = (
+            f"trying to parse field '{'.'.join(parsed_fields)}' "
+            f"of topic '{real_topic}': "
+        )
+        no_field_error_msg = base_err_msg + f"'{name}' is not a field of '{topic_type_str}'"
 
         try:
             slot_index = current_message_class.__slots__.index(f'_{name}')
