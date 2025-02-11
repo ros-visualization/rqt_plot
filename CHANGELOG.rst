@@ -2,6 +2,12 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.1 (2025-01-11)
+------------------
+* Add single quotes around topic in validation msg for consistency (`#99 <https://github.com/ros-visualization/rqt_plot/issues/99>`_)
+  This is more consistent with the other messages below.
+* Contributors: Christophe Bedard
+
 1.6.0 (2024-12-20)
 ------------------
 * Add in the rest of the standard ament_python tests. (`#98 <https://github.com/ros-visualization/rqt_plot/issues/98>`_)
