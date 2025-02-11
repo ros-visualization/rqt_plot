@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.3 (2025-02-11)
+------------------
+* Add single quotes around topic in validation msg for consistency (backport `#99 <https://github.com/ros-visualization/rqt_plot/issues/99>`_) (`#103 <https://github.com/ros-visualization/rqt_plot/issues/103>`_)
+* Contributors: mergify[bot]
+
 1.1.2 (2022-05-10)
 ------------------
 * Fix fixed-size Array visualization (`#81 <https://github.com/ros-visualization/rqt_plot/issues/81>`_)
