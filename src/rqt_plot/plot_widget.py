@@ -171,8 +171,11 @@ def get_plot_fields(node, topic_name):
             if isinstance(n_current_type, BasicType):
                 plottable_fields.append(n_field)
         if plottable_fields:
+            # We try to plot the sub-fields of a field if '/topic/field' or '/topic/field/', so
+            # make sure to remove trailing slashes
+            topic_name_rstrip = topic_name.rstrip('/')
             return (
-                [f'{topic_name}/{field}' for field in plottable_fields],
+                [f'{topic_name_rstrip}/{field}' for field in plottable_fields],
                 f"{len(plottable_fields)} plottable fields in '{topic_name}'"
             )
     if not isinstance(current_type, BasicType):
