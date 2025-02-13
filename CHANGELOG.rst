@@ -2,6 +2,14 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.2 (2025-02-13)
+------------------
+* Add unit tests for topic name validation & field expansion (backport `#108 <https://github.com/ros-visualization/rqt_plot/issues/108>`_) (`#110 <https://github.com/ros-visualization/rqt_plot/issues/110>`_)
+* Fix double slash when plotting all sub-fields with trailing slash (backport `#107 <https://github.com/ros-visualization/rqt_plot/issues/107>`_) (`#109 <https://github.com/ros-visualization/rqt_plot/issues/109>`_)
+* Fix f-string and add single quote around field name (backport `#100 <https://github.com/ros-visualization/rqt_plot/issues/100>`_) (`#104 <https://github.com/ros-visualization/rqt_plot/issues/104>`_)
+* Fix listing of nested basic type fields (backport `#101 <https://github.com/ros-visualization/rqt_plot/issues/101>`_) (`#106 <https://github.com/ros-visualization/rqt_plot/issues/106>`_)
+* Contributors: mergify[bot]
+
 1.4.1 (2025-02-11)
 ------------------
 * Add single quotes around topic in validation msg for consistency (backport `#99 <https://github.com/ros-visualization/rqt_plot/issues/99>`_) (`#102 <https://github.com/ros-visualization/rqt_plot/issues/102>`_)
