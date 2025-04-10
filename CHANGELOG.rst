@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Import setup from setuptools instead of distutils.core (`#86 <https://github.com/ros-visualization/rqt_plot/issues/86>`_)
+* Contributors: Arne Hitzmann, Matthijs van der Burgh
+
 0.4.14 (2021-12-03)
 -------------------
 * Fix Qwt plot engine (`#70 <https://github.com/ros-visualization/rqt_plot/issues/70>`_)
