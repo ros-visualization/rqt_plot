@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.15 (2025-04-10)
+-------------------
 * Import setup from setuptools instead of distutils.core (`#86 <https://github.com/ros-visualization/rqt_plot/issues/86>`_)
 * Contributors: Arne Hitzmann, Matthijs van der Burgh
 
