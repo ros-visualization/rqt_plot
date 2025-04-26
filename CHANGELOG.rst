@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.16 (2025-04-26)
+-------------------
 * Fix linalg error  (`#84 <https://github.com/ros-visualization/rqt_plot/issues/84>`_)
 * Bump cmake_minimum_required to avoid deprecation (`#113 <https://github.com/ros-visualization/rqt_plot/issues/113>`_)
 * Contributors: Arne Hitzmann, Karen Bodie
