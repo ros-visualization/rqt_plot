@@ -2,6 +2,9 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.0 (2025-04-28)
+------------------
+
 1.6.2 (2025-01-13)
 ------------------
 * Add unit tests for topic name validation & field expansion (`#108 <https://github.com/ros-visualization/rqt_plot/issues/108>`_)
