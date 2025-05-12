@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.5 (2025-05-12)
+------------------
+* Fix for displaying constant curves (backport `#114 <https://github.com/ros-visualization/rqt_plot/issues/114>`_) (`#117 <https://github.com/ros-visualization/rqt_plot/issues/117>`_)
+* Contributors: mergify[bot]
+
 1.1.4 (2025-03-25)
 ------------------
 * Fix f-string and add single quote around field name (backport `#100 <https://github.com/ros-visualization/rqt_plot/issues/100>`_) (`#105 <https://github.com/ros-visualization/rqt_plot/issues/105>`_)
