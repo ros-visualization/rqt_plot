@@ -518,6 +518,10 @@ class DataPlot(QWidget):
             y_limit[0] = 0.0
         if numpy.isinf(y_limit[1]):
             y_limit[1] = 1.0
+        # Handle constant curves
+        if abs(y_limit[0] - y_limit[1]) < 1e-8:
+            y_limit[0] -= 0.5
+            y_limit[1] += 0.5
 
         self.set_xlim(x_limit)
         self.set_ylim(y_limit)
