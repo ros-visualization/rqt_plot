@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.3 (2025-05-12)
+------------------
+* Fix for displaying constant curves (backport `#114 <https://github.com/ros-visualization/rqt_plot/issues/114>`_) (`#116 <https://github.com/ros-visualization/rqt_plot/issues/116>`_)
+* Contributors: mergify[bot]
+
 1.4.2 (2025-02-13)
 ------------------
 * Add unit tests for topic name validation & field expansion (backport `#108 <https://github.com/ros-visualization/rqt_plot/issues/108>`_) (`#110 <https://github.com/ros-visualization/rqt_plot/issues/110>`_)
