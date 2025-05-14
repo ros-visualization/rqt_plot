@@ -35,6 +35,7 @@
   <test_depend>ament_pep257</test_depend>
   <test_depend>ament_xmllint</test_depend>
   <test_depend>python3-pytest</test_depend>
+  <test_depend>test_msgs</test_depend>
 
   <export>
     <architecture_independent/>
