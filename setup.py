@@ -23,7 +23,6 @@ setup(
     keywords=['ROS'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
@@ -32,6 +31,14 @@ setup(
         'using different plotting backends.'
     ),
     license='BSD',
+<<<<<<< HEAD
+=======
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
+>>>>>>> 839ff5b (fix setuptools deprecations (#123))
     entry_points={
         'console_scripts': [
             'rqt_plot = ' + package_name + '.main:main',
