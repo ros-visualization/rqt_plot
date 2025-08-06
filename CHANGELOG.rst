@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.4 (2025-08-06)
+------------------
 * Added missing test dependency (backport `#118 <https://github.com/ros-visualization/rqt_plot/issues/118>`_) (`#120 <https://github.com/ros-visualization/rqt_plot/issues/120>`_)
   Added missing test dependency (`#118 <https://github.com/ros-visualization/rqt_plot/issues/118>`_)
   (cherry picked from commit 365f7a829a06681d571767348015f2ccdc2530d0)
