@@ -2,6 +2,14 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added missing test dependency (backport `#118 <https://github.com/ros-visualization/rqt_plot/issues/118>`_) (`#120 <https://github.com/ros-visualization/rqt_plot/issues/120>`_)
+  Added missing test dependency (`#118 <https://github.com/ros-visualization/rqt_plot/issues/118>`_)
+  (cherry picked from commit 365f7a829a06681d571767348015f2ccdc2530d0)
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: mergify[bot]
+
 1.4.3 (2025-05-12)
 ------------------
 * Fix for displaying constant curves (backport `#114 <https://github.com/ros-visualization/rqt_plot/issues/114>`_) (`#116 <https://github.com/ros-visualization/rqt_plot/issues/116>`_)
