@@ -2,8 +2,8 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.4.5 (2026-01-21)
+------------------
 * fix setuptools deprecations (backport `#123 <https://github.com/ros-visualization/rqt_plot/issues/123>`_) (`#125 <https://github.com/ros-visualization/rqt_plot/issues/125>`_)
   fix setuptools deprecations (`#123 <https://github.com/ros-visualization/rqt_plot/issues/123>`_)
   (cherry picked from commit 839ff5b7434f7a8342a085d2bf7182a00d38f040)
