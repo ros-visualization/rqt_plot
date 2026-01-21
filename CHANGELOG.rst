@@ -2,6 +2,14 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix setuptools deprecations (backport `#123 <https://github.com/ros-visualization/rqt_plot/issues/123>`_) (`#125 <https://github.com/ros-visualization/rqt_plot/issues/125>`_)
+  fix setuptools deprecations (`#123 <https://github.com/ros-visualization/rqt_plot/issues/123>`_)
+  (cherry picked from commit 839ff5b7434f7a8342a085d2bf7182a00d38f040)
+  Co-authored-by: mosfet80 <10235105+mosfet80@users.noreply.github.com>
+* Contributors: mergify[bot]
+
 1.4.4 (2025-08-06)
 ------------------
 * Added missing test dependency (backport `#118 <https://github.com/ros-visualization/rqt_plot/issues/118>`_) (`#120 <https://github.com/ros-visualization/rqt_plot/issues/120>`_)
