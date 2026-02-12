@@ -31,7 +31,7 @@ import math
 import sys
 
 from python_qt_binding.QtCore import QEvent, QPointF, QSize, Qt, qWarning, Signal
-from python_qt_binding.QtGui import QBrush, QColor, QPen, QVector2D
+from python_qt_binding.QtGui import QBrush, QColorConstants, QPen, QVector2D
 import Qwt
 
 
@@ -75,8 +75,8 @@ class QwtDataPlot(Qwt.QwtPlot):
             Qwt.QwtPlot.xBottom, Qwt.QwtPlot.yLeft, Qwt.QwtPicker.PolygonSelection,
             Qwt.QwtPlotPicker.PolygonRubberBand, Qwt.QwtPicker.AlwaysOn, self.canvas()
         )
-        self._picker.setRubberBandPen(QPen(Qt.blue))
-        self._picker.setTrackerPen(QPen(Qt.blue))
+        self._picker.setRubberBandPen(QPen(QColorConstants.Blue))
+        self._picker.setTrackerPen(QPen(QColorConstants.Blue))
 
         # Initialize data
         self.rescale()
@@ -114,7 +114,7 @@ class QwtDataPlot(Qwt.QwtPlot):
         Qwt.QwtPlot.resizeEvent(self, event)
         self.rescale()
 
-    def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
+    def add_curve(self, curve_id, curve_name, curve_color=QColorConstants.Blue, markers_on=False):
         curve_id = str(curve_id)
         if curve_id in self._curves:
             return
