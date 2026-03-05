@@ -45,7 +45,7 @@ class QwtDataPlot(Qwt.QwtPlot):
 
     def __init__(self, *args):
         super(QwtDataPlot, self).__init__(*args)
-        self.setCanvasBackground(Qt.white)
+        self.setCanvasBackground(QColorConstants.White)
         self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.BottomLegend)
 
         self._curves = {}
@@ -66,7 +66,7 @@ class QwtDataPlot(Qwt.QwtPlot):
         self._last_click_coordinates = None
 
         marker_axis_y = Qwt.QwtPlotMarker()
-        marker_axis_y.setLabelAlignment(Qt.AlignRight | Qt.AlignTop)
+        marker_axis_y.setLabelAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
         marker_axis_y.setLineStyle(Qwt.QwtPlotMarker.HLine)
         marker_axis_y.setYValue(0.0)
         marker_axis_y.attach(self)
