@@ -47,9 +47,9 @@ if QT_BINDING == 'pyside':
     if parse_version(qt_binding_version) <= parse_version('1.1.2'):
         raise ImportError('A PySide version newer than 1.1.0 is required.')
 
-from python_qt_binding.QtCore import Qt, Signal
+from python_qt_binding.QtCore import Signal
 from python_qt_binding.QtGui import QColorConstants
-from python_qt_binding.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
+from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
 
 if QT_BINDING == 'pyside':
     if parse_version(matplotlib.__version__) < parse_version('2.1.0'):
@@ -77,7 +77,9 @@ class MatDataPlot(QWidget):
             self.axes = self.figure.add_subplot(111)
             self.axes.grid(True, color='gray')
             self.safe_tight_layout()
-            self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+            self.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding)
             self.updateGeometry()
 
         def resizeEvent(self, event):

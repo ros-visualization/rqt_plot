@@ -30,7 +30,7 @@
 import numpy
 
 from python_qt_binding import QT_BINDING
-from python_qt_binding.QtCore import Qt, qWarning, Signal
+from python_qt_binding.QtCore import qWarning, Signal
 from python_qt_binding.QtGui import QColor, QColorConstants
 from python_qt_binding.QtWidgets import QHBoxLayout, QWidget
 from qt_gui_py_common.simple_settings_dialog import SimpleSettingsDialog

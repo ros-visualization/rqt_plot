@@ -28,8 +28,8 @@
 
 from pyqtgraph import mkBrush, mkPen, PlotWidget
 
-from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtGui import QColorConstants
+from python_qt_binding.QtCore import Signal
+from python_qt_binding.QtGui import QColor, QColorConstants
 from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
 
 try:
