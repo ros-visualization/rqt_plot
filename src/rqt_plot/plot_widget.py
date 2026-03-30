@@ -35,7 +35,7 @@ from python_qt_binding import loadUi
 from python_qt_binding import QT_BINDING_VERSION
 from python_qt_binding.QtCore import Qt, QTimer, qWarning, Slot
 from packaging.version import Version
-if Version(QT_BINDING_VERSION) > Version('6.0.0'):
+if Version(QT_BINDING_VERSION) >= Version('6.0.0'):
     from python_qt_binding.QtGui import QAction
 else:
     from python_qt_binding.QtWidgets import QAction
