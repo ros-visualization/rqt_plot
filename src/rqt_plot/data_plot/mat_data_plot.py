@@ -32,7 +32,7 @@ import matplotlib
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
-from python_qt_binding import QT_BINDING, QT_BINDING_VERSION
+from python_qt_binding import QT_BINDING, QT_BINDING_VERSION, QtWidgets
 
 try:
     from pkg_resources import parse_version
@@ -47,9 +47,9 @@ if QT_BINDING == 'pyside':
     if parse_version(qt_binding_version) <= parse_version('1.1.2'):
         raise ImportError('A PySide version newer than 1.1.0 is required.')
 
-from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtGui import QColor
-from python_qt_binding.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
+from python_qt_binding.QtCore import Signal
+from python_qt_binding.QtGui import QColorConstants
+from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
 
 if QT_BINDING == 'pyside':
     if parse_version(matplotlib.__version__) < parse_version('2.1.0'):
@@ -77,7 +77,9 @@ class MatDataPlot(QWidget):
             self.axes = self.figure.add_subplot(111)
             self.axes.grid(True, color='gray')
             self.safe_tight_layout()
-            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding)
             self.updateGeometry()
 
         def resizeEvent(self, event):
@@ -120,7 +122,7 @@ class MatDataPlot(QWidget):
     def _limits_changed(self, event):
         self.limits_changed.emit()
 
-    def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
+    def add_curve(self, curve_id, curve_name, curve_color=QColorConstants.Blue, markers_on=False):
 
         # adding an empty curve and change the limits, so save and restore them
         x_limits = self.get_xlim()

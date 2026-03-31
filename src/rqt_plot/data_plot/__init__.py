@@ -30,8 +30,8 @@
 import numpy
 
 from python_qt_binding import QT_BINDING
-from python_qt_binding.QtCore import Qt, qWarning, Signal
-from python_qt_binding.QtGui import QColor
+from python_qt_binding.QtCore import qWarning, Signal
+from python_qt_binding.QtGui import QColor, QColorConstants
 from python_qt_binding.QtWidgets import QHBoxLayout, QWidget
 from qt_gui_py_common.simple_settings_dialog import SimpleSettingsDialog
 from rqt_py_common.ini_helper import pack, unpack
@@ -112,8 +112,10 @@ class DataPlot(QWidget):
     SCALE_VISIBLE = 2
     SCALE_EXTEND = 4
 
-    _colors = [Qt.blue, Qt.red, Qt.cyan, Qt.magenta, Qt.green,
-               Qt.darkYellow, Qt.black, Qt.darkCyan, Qt.darkRed, Qt.gray]
+    _colors = [QColorConstants.Blue, QColorConstants.Red, QColorConstants.Cyan,
+               QColorConstants.Magenta, QColorConstants.Green,
+               QColorConstants.DarkYellow, QColorConstants.Black,
+               QColorConstants.DarkCyan, QColorConstants.DarkRed, QColorConstants.Gray]
 
     limits_changed = Signal()
     _redraw = Signal()

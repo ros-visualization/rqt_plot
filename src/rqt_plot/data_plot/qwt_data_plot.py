@@ -31,7 +31,7 @@ import math
 import sys
 
 from python_qt_binding.QtCore import QEvent, QPointF, QSize, Qt, qWarning, Signal
-from python_qt_binding.QtGui import QBrush, QColor, QPen, QVector2D
+from python_qt_binding.QtGui import QBrush, QColorConstants, QPen, QVector2D
 import Qwt
 
 
@@ -45,7 +45,7 @@ class QwtDataPlot(Qwt.QwtPlot):
 
     def __init__(self, *args):
         super(QwtDataPlot, self).__init__(*args)
-        self.setCanvasBackground(Qt.white)
+        self.setCanvasBackground(QColorConstants.White)
         self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.BottomLegend)
 
         self._curves = {}
@@ -66,7 +66,7 @@ class QwtDataPlot(Qwt.QwtPlot):
         self._last_click_coordinates = None
 
         marker_axis_y = Qwt.QwtPlotMarker()
-        marker_axis_y.setLabelAlignment(Qt.AlignRight | Qt.AlignTop)
+        marker_axis_y.setLabelAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
         marker_axis_y.setLineStyle(Qwt.QwtPlotMarker.HLine)
         marker_axis_y.setYValue(0.0)
         marker_axis_y.attach(self)
@@ -75,8 +75,8 @@ class QwtDataPlot(Qwt.QwtPlot):
             Qwt.QwtPlot.xBottom, Qwt.QwtPlot.yLeft, Qwt.QwtPicker.PolygonSelection,
             Qwt.QwtPlotPicker.PolygonRubberBand, Qwt.QwtPicker.AlwaysOn, self.canvas()
         )
-        self._picker.setRubberBandPen(QPen(Qt.blue))
-        self._picker.setTrackerPen(QPen(Qt.blue))
+        self._picker.setRubberBandPen(QPen(QColorConstants.Blue))
+        self._picker.setTrackerPen(QPen(QColorConstants.Blue))
 
         # Initialize data
         self.rescale()
@@ -114,7 +114,7 @@ class QwtDataPlot(Qwt.QwtPlot):
         Qwt.QwtPlot.resizeEvent(self, event)
         self.rescale()
 
-    def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
+    def add_curve(self, curve_id, curve_name, curve_color=QColorConstants.Blue, markers_on=False):
         curve_id = str(curve_id)
         if curve_id in self._curves:
             return

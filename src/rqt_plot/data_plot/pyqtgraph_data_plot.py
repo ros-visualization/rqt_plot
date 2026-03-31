@@ -28,8 +28,8 @@
 
 from pyqtgraph import mkBrush, mkPen, PlotWidget
 
-from python_qt_binding.QtCore import Qt, Signal
-from python_qt_binding.QtGui import QColor
+from python_qt_binding.QtCore import Signal
+from python_qt_binding.QtGui import QColor, QColorConstants
 from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
 
 try:
@@ -71,10 +71,10 @@ class PyQtGraphDataPlot(QWidget):
         self._curves = {}
         self._current_vline = None
 
-    def add_curve(self, curve_id, curve_name, curve_color=QColor(Qt.blue), markers_on=False):
+    def add_curve(self, curve_id, curve_name, curve_color=QColorConstants.Blue, markers_on=False):
         pen = mkPen(curve_color, width=1)
         symbol = 'o'
-        symbolPen = mkPen(QColor(Qt.black))
+        symbolPen = mkPen(QColor(QColorConstants.Black))
         symbolBrush = mkBrush(curve_color)
         # this adds the item to the plot and legend
         if markers_on:
