@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.4 (2026-04-13)
+------------------
+* Support Qt6 (`#127 <https://github.com/ros-visualization/rqt_plot/issues/127>`_)
+* Contributors: Alejandro Hernández Cordero
+
 1.7.3 (2025-07-30)
 ------------------
 * fix setuptools deprecations (`#123 <https://github.com/ros-visualization/rqt_plot/issues/123>`_)
