@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use qt-base-dev / libqtwidgets (`#128 <https://github.com/ros-visualization/rqt_plot/issues/128>`_)
+* Contributors: Shane Loretz
+
 1.7.4 (2026-04-13)
 ------------------
 * Support Qt6 (`#127 <https://github.com/ros-visualization/rqt_plot/issues/127>`_)
