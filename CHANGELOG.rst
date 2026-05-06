@@ -2,6 +2,9 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.0 (2026-05-06)
+------------------
+
 1.7.5 (2026-04-24)
 ------------------
 * Use qt-base-dev / libqtwidgets (`#128 <https://github.com/ros-visualization/rqt_plot/issues/128>`_)
