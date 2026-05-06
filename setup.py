@@ -4,7 +4,7 @@ package_name = 'rqt_plot'
 
 setup(
     name=package_name,
-    version='1.7.5',
+    version='2.0.0',
     packages=[package_name, package_name + '/data_plot'],
     package_dir={'': 'src'},
     data_files=[
