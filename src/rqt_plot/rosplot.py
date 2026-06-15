@@ -94,7 +94,7 @@ class ROSData:
                 data_class, real_topic, self._ros_cb,
                 qos_profile=self.choose_qos(node, real_topic))
         else:
-            self.error = RosPlotException('Can not resolve topic type of %s' % topic)
+            self.error = RosPlotException(f'Can not resolve topic type of {topic}')
 
     def choose_qos(self, node, topic_name):
 
@@ -118,7 +118,7 @@ class ROSData:
             qos_profile.reliability = QoSReliabilityPolicy.RELIABLE
         else:
             if reliability_reliable_endpoints_count > 0:
-                print(
+                node.get_logger().warning(
                     'Some, but not all, publishers are offering '
                     'QoSReliabilityPolicy.RELIABLE. Falling back to '
                     'QoSReliabilityPolicy.BEST_EFFORT as it will connect '
@@ -131,7 +131,7 @@ class ROSData:
             qos_profile.durability = QoSDurabilityPolicy.TRANSIENT_LOCAL
         else:
             if durability_transient_local_endpoints_count > 0:
-                print(
+                node.get_logger().warning(
                     'Some, but not all, publishers are offering '
                     'QoSDurabilityPolicy.TRANSIENT_LOCAL. Falling back to '
                     'QoSDurabilityPolicy.VOLATILE as it will connect '
@@ -149,8 +149,7 @@ class ROSData:
 
         :param msg: ROS message data
         """
-        try:
-            self.lock.acquire()
+        with self.lock:
             try:
                 self.buff_y.append(self._get_data(msg))
                 # 944: use message header time if present
@@ -162,8 +161,6 @@ class ROSData:
                 # self.axes[index].plot(datax, buff_y)
             except AttributeError as e:
                 self.error = RosPlotException('Invalid topic spec [%s]: %s' % (self.name, str(e)))
-        finally:
-            self.lock.release()
 
     def next_data(self):
         """
@@ -173,14 +170,11 @@ class ROSData:
         """
         if self.error:
             raise self.error
-        try:
-            self.lock.acquire()
+        with self.lock:
             buff_x = self.buff_x
             buff_y = self.buff_y
             self.buff_x = []
             self.buff_y = []
-        finally:
-            self.lock.release()
         return buff_x, buff_y
 
     def _get_data(self, msg):

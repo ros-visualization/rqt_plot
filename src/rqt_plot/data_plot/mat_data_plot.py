@@ -73,7 +73,7 @@ class MatDataPlot(QWidget):
         """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
         def __init__(self, parent=None):
-            super(MatDataPlot.Canvas, self).__init__(Figure())
+            super().__init__(Figure())
             self.axes = self.figure.add_subplot(111)
             self.axes.grid(True, color='gray')
             self.safe_tight_layout()
@@ -83,7 +83,7 @@ class MatDataPlot(QWidget):
             self.updateGeometry()
 
         def resizeEvent(self, event):
-            super(MatDataPlot.Canvas, self).resizeEvent(event)
+            super().resizeEvent(event)
             self.safe_tight_layout()
 
         def safe_tight_layout(self):
@@ -107,7 +107,7 @@ class MatDataPlot(QWidget):
     limits_changed = Signal()
 
     def __init__(self, parent=None):
-        super(MatDataPlot, self).__init__(parent)
+        super().__init__(parent)
         self._canvas = MatDataPlot.Canvas()
         self._toolbar = NavigationToolbar(self._canvas, self._canvas)
         vbox = QVBoxLayout()

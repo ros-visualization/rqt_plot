@@ -39,7 +39,7 @@ from .plot_widget import PlotWidget
 class Plot(Plugin):
 
     def __init__(self, context):
-        super(Plot, self).__init__(context)
+        super().__init__(context)
         self.setObjectName('Plot')
 
         self._context = context
@@ -57,7 +57,7 @@ class Plot(Plugin):
         self._widget.switch_data_plot_widget(self._data_plot)
         if context.serial_number() > 1:
             self._widget.setWindowTitle(
-                self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+                self._widget.windowTitle() + f' ({context.serial_number()})')
         context.add_widget(self._widget)
 
     def _resolve_topic_name(self, script_name, name):
@@ -106,7 +106,7 @@ class Plot(Plugin):
                     # the first prefix includes a field name, so save then strip it off
                     c_topics.append(base)
                     if '/' not in base:
-                        parser.error('%s must contain a topic and field name' % sub_t)
+                        parser.error(f'{sub_t} must contain a topic and field name')
                     base = base[:base.rfind('/')]
 
                     # compute the rest of the field names
@@ -135,7 +135,7 @@ class Plot(Plugin):
         self._widget.setWindowTitle(self._data_plot.getTitle())
         if self._context.serial_number() > 1:
             self._widget.setWindowTitle(
-                self._widget.windowTitle() + (' (%d)' % self._context.serial_number()))
+                self._widget.windowTitle() + f' ({self._context.serial_number()})')
 
     def save_settings(self, plugin_settings, instance_settings):
         self._data_plot.save_settings(plugin_settings, instance_settings)
