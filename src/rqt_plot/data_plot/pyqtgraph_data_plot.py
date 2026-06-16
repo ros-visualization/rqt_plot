@@ -58,7 +58,7 @@ class PyQtGraphDataPlot(QWidget):
     limits_changed = Signal()
 
     def __init__(self, parent=None):
-        super(PyQtGraphDataPlot, self).__init__(parent)
+        super().__init__(parent)
         self._plot_widget = PlotWidget()
         self._plot_widget.getPlotItem().addLegend()
         self._plot_widget.setBackground((255, 255, 255))

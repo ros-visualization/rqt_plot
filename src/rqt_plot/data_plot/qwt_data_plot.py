@@ -44,7 +44,7 @@ class QwtDataPlot(Qwt.QwtPlot):
     limits_changed = Signal()
 
     def __init__(self, *args):
-        super(QwtDataPlot, self).__init__(*args)
+        super().__init__(*args)
         self.setCanvasBackground(QColorConstants.White)
         self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.BottomLegend)
 
@@ -250,4 +250,4 @@ if __name__ == '__main__':
         plot.update_value(0, (i / 500.0) * (i / 5.0))
         plot.update_value(1, math.sin(i / 20.0) * 500)
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
