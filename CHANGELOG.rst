@@ -2,6 +2,11 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.6 (2026-06-16)
+------------------
+* Use logger.warning(), f-string , super() and Qt6 fixes (backport `#129 <https://github.com/ros-visualization/rqt_plot/issues/129>`_) (`#130 <https://github.com/ros-visualization/rqt_plot/issues/130>`_)
+* Contributors: mergify[bot]
+
 1.7.5 (2026-04-24)
 ------------------
 * Use qt-base-dev / libqtwidgets (`#128 <https://github.com/ros-visualization/rqt_plot/issues/128>`_)
