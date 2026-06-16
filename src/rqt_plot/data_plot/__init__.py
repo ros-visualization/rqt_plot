@@ -128,7 +128,7 @@ class DataPlot(QWidget):
         This will raise a RuntimeError if none of the supported plotting
         backends can be found.
         """
-        super(DataPlot, self).__init__(parent)
+        super().__init__(parent)
         self._plot_index = 0
         self._color_index = 0
         self._markers_on = False
@@ -154,7 +154,7 @@ class DataPlot(QWidget):
                 version_info += ' and PySide 2.0.0'
             raise RuntimeError(
                 'No usable plot type found. Install at least one of: PyQtGraph, MatPlotLib '
-                '(at least %s) or Python-Qwt5.' % version_info)
+                f'(at least {version_info}) or Python-Qwt5.')
 
         self._switch_data_plot_widget(self._plot_index)
 
@@ -329,8 +329,7 @@ class DataPlot(QWidget):
         if curve_id in self._curves:
             return self._curves[curve_id]
         else:
-            raise DataPlotException('No curve named %s in this DataPlot' %
-                                    (curve_id))
+            raise DataPlotException(f'No curve named {curve_id} in this DataPlot')
 
     def add_curve(self, curve_id, curve_name, data_x, data_y):
         """

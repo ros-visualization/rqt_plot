@@ -93,14 +93,14 @@ def get_plot_fields(node, topic_name):
         return [], message
 
     if len(topic_name) < len(real_topic) + 1:
-        message = "no field specified in topic name '{}'".format(topic_name)
+        message = f"no field specified in topic name '{topic_name}'"
         return [], message
 
     nested_field_path = topic_name[len(real_topic) + 1:]
 
     message_class = get_message(topic_type_str)
     if message_class is None:
-        message = 'message class "{}" is invalid'.format(topic_type_str)
+        message = f'message class "{topic_type_str}" is invalid'
         return [], message
 
     nested_fields = iter(f for f in nested_field_path.split('/') if f)
@@ -200,7 +200,7 @@ class PlotWidget(QWidget):
     _redraw_interval = 40
 
     def __init__(self, node, initial_topics=None, start_paused=False):
-        super(PlotWidget, self).__init__()
+        super().__init__()
         self.setObjectName('PlotWidget')
 
         self._node = node
@@ -268,7 +268,7 @@ class PlotWidget(QWidget):
                     'len(event.source().selectedItems()) == 0')
                 return
             item = event.source().selectedItems()[0]
-            topic_name = item.data(0, Qt.UserRole)
+            topic_name = item.data(0, Qt.ItemDataRole.UserRole)
             if topic_name is None:
                 qWarning('Plot.dragEnterEvent(): not hasattr(item, ros_topic_name_)')
                 return
@@ -288,7 +288,7 @@ class PlotWidget(QWidget):
             topic_name = str(event.mimeData().text())
         else:
             droped_item = event.source().selectedItems()[0]
-            topic_name = str(droped_item.data(0, Qt.UserRole))
+            topic_name = str(droped_item.data(0, Qt.ItemDataRole.UserRole))
         self.add_topic(topic_name)
 
     @Slot(str)
@@ -334,7 +334,7 @@ class PlotWidget(QWidget):
                         self.data_plot.update_values(topic_name, data_x, data_y)
                         needs_redraw = True
                 except RosPlotException as e:
-                    qWarning('PlotWidget.update_plot(): error in rosplot: %s' % e)
+                    qWarning(f'PlotWidget.update_plot(): error in rosplot: {e}')
             if needs_redraw:
                 self.data_plot.redraw()
 
@@ -366,7 +366,7 @@ class PlotWidget(QWidget):
         topics_changed = False
         for topic_name in get_plot_fields(self._node, topic_name)[0]:
             if topic_name in self._rosdata:
-                qWarning('PlotWidget.add_topic(): topic already subscribed: %s' % topic_name)
+                qWarning(f'PlotWidget.add_topic(): topic already subscribed: {topic_name}')
                 continue
             self._rosdata[topic_name] = ROSData(self._node, topic_name, self._start_time)
             if self._rosdata[topic_name].error is not None:
