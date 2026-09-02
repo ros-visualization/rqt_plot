@@ -31,15 +31,9 @@ import re
 import time
 
 from ament_index_python.resources import get_resource
-from packaging.version import Version
 from python_qt_binding import loadUi
-from python_qt_binding import QT_BINDING_VERSION
 from python_qt_binding.QtCore import Qt, QTimer, qWarning, Slot
-if Version(QT_BINDING_VERSION) >= Version('6.0.0'):
-    from python_qt_binding.QtGui import QAction
-else:
-    from python_qt_binding.QtWidgets import QAction
-from python_qt_binding.QtGui import QIcon
+from python_qt_binding.QtGui import QAction, QIcon
 from python_qt_binding.QtWidgets import QMenu, QWidget
 
 from rosidl_parser.definition import AbstractGenericString

@@ -29,42 +29,18 @@
 import operator
 
 import matplotlib
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
+matplotlib.use('QtAgg')
 
-from python_qt_binding import QT_BINDING, QT_BINDING_VERSION, QtWidgets
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # noqa: E402
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar  # noqa: E402,E501
+from matplotlib.figure import Figure  # noqa: E402
 
-try:
-    from pkg_resources import parse_version
-except ImportError:
-    import re
+from packaging.version import Version  # noqa: E402
 
-    def parse_version(s):
-        return [int(x) for x in re.sub(r'(\.0+)*$', '', s).split('.')]
-
-if QT_BINDING == 'pyside':
-    qt_binding_version = QT_BINDING_VERSION.replace('~', '-')
-    if parse_version(qt_binding_version) <= parse_version('1.1.2'):
-        raise ImportError('A PySide version newer than 1.1.0 is required.')
-
-from python_qt_binding.QtCore import Signal
-from python_qt_binding.QtGui import QColorConstants
-from python_qt_binding.QtWidgets import QVBoxLayout, QWidget
-
-if QT_BINDING == 'pyside':
-    if parse_version(matplotlib.__version__) < parse_version('2.1.0'):
-        raise ImportError('A newer matplotlib is required (at least 2.1.0 for PySide 2)')
-if parse_version(matplotlib.__version__) < parse_version('1.4.0'):
-    raise ImportError('A newer matplotlib is required (at least 1.4.0 for Qt 5)')
-try:
-    matplotlib.use('Qt5Agg')
-    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-except ImportError:
-    # work around bug in dateutil
-    import sys
-    import thread
-    sys.modules['_thread'] = thread
-    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from python_qt_binding import QtWidgets  # noqa: E402
+from python_qt_binding.QtCore import Signal  # noqa: E402
+from python_qt_binding.QtGui import QColorConstants  # noqa: E402
+from python_qt_binding.QtWidgets import QVBoxLayout, QWidget  # noqa: E402
 
 
 class MatDataPlot(QWidget):
@@ -101,7 +77,7 @@ class MatDataPlot(QWidget):
                     return
                 self.figure.tight_layout()
             except ValueError:
-                if parse_version(matplotlib.__version__) >= parse_version('2.2.3'):
+                if Version(matplotlib.__version__) >= Version('2.2.3'):
                     raise
 
     limits_changed = Signal()

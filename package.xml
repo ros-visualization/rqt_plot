@@ -17,9 +17,6 @@
   <author email="mabel@openrobotics.org">Mabel Zhang</author>
   <author email="logans@cottsay.net">Scott K Logan</author>
 
-  <build_depend>qt-base-dev</build_depend>
-  <build_depend>libqtwidgets</build_depend>
-
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend version_gte="0.2.19">python_qt_binding</exec_depend>
   <exec_depend>python3-matplotlib</exec_depend>
