@@ -2,6 +2,9 @@
 Changelog for package rqt_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.3 (2026-10-22)
+------------------
+
 2.0.2 (2026-09-04)
 ------------------
 * Removed Qt5 support (`#131 <https://github.com/ros-visualization/rqt_plot/issues/131>`_)
